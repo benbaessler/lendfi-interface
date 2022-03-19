@@ -14,7 +14,8 @@ contract Loan {
     uint256 deadline
   );
 
-  event ConfirmLoan(uint256 indexed id, address indexed signer);
+  event ConfirmLoan(uint256 indexed id, address indexed user);
+  event RevokeConfirmation(uint256 indexed id, address indexed user);
 
   struct NFT {
     address _address;
@@ -51,6 +52,11 @@ contract Loan {
     _;
   }
 
+  modifier notConfirmed(uint256 _id) {
+    require(loans[_id].confirmations < 2, "This loan was already confirmed");
+    _;
+  }
+
   function submitLoan(address _lender, address _borrower, uint256 _amount, NFT[] memory _collateral, uint256 _deadline) public {
     uint256 id = loans.length;
 
@@ -69,17 +75,22 @@ contract Loan {
     emit SubmitLoan(id, _lender, _borrower, _amount, _collateral, _deadline);
   }
 
-  function confirmLoan(uint256 _id) public loanExists(_id) notExecuted(_id) {
-    Loan storage loan = loans[_id];
-
-    require(loan.lender == msg.sender || loan.borrower == msg.sender, "You are not participating in this loan");
-    require(loan.confirmations < 2, "This loan was already confirmed");
+  function confirmLoan(uint256 _id) public loanExists(_id) notExecuted(_id) isParticipator(_id) notConfirmed(_id) {
     require(!isConfirmed[_id][msg.sender], "You already confirmed this loan");
 
-    loan.confirmations += 1;
+    loans[_id].confirmations += 1;
     isConfirmed[_id][msg.sender] = true;
 
     emit ConfirmLoan(_id, msg.sender);
+  }
+
+  function revokeConfirmation(uint256 _id) public loanExists(_id) notExecuted(_id) isParticipator(_id) notConfirmed(_id) {
+    require(isConfirmed[_id][msg.sender], "You did not confirm this loan");
+
+    loans[_id].confirmations -= 1;
+    isConfirmed[_id][msg.sender] = false;
+
+    emit RevokeConfirmation(_id, msg.sender);
   }
 
 }
