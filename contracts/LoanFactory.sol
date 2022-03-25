@@ -130,10 +130,15 @@ contract LoanFactory {
 
   function paybackLoan(uint256 _id) public payable loanExists(_id) notExecuted(_id) isBorrower(_id) {
     Loan storage loan = loans[_id];
+
+    require(loan.active, "Loan is not active");
     require(msg.value >= loan.amount, "You have not sent enough ETH");
 
     bool loanPaid = loan.lender.send(msg.value);
     require(loanPaid, "Something went wrong with the payment");
+
+    IERC721 collateral = IERC721(loan.collateral.contractAddress);
+    collateral.transferFrom(address(this), loan.borrower, loan.collateral.tokenId);
 
     loan.active = false;
     loan.executed = true;
