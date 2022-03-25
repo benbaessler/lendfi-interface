@@ -62,7 +62,23 @@ describe("LoanFactory contract", () => {
       expect(collateralBalance).to.equal(1)
     })
 
-    it('Should activate loan as both parties confirm the loan', async () => {
+    it('Should not let third party confirm loan', async () => {
+      await expect(contract.connect(user3).confirmLender(0)).to.be.revertedWith('You are not the lender of this loan')
+      await expect(contract.connect(user3).confirmBorrower(0)).to.be.revertedWith('You are not the borrower of this loan')
+    })
+  })
+
+  describe('Executing a loan', () => {
+
+    beforeEach(async () => {
+      await contract.submitLoan(
+        user1.address, 
+        user2.address, 
+        ethers.utils.parseEther('.5'),
+        { contractAddress: collateral.address, tokenId: 1 },
+        1234567
+      )
+
       // Confirming lender
       await contract.confirmLender(0, { value: ethers.utils.parseEther('.5') })
 
@@ -70,13 +86,42 @@ describe("LoanFactory contract", () => {
       await collateral.connect(user2).mint()
       await collateral.connect(user2).setApprovalForAll(contract.address, true)
       await contract.connect(user2).confirmBorrower(0)
+    })
 
+    it('Should activate loan as both parties confirm loan', async () => {
       const loan = await contract.getLoan(0)
       expect(loan.active).to.equal(true)
     })
 
-    // it('Should not let third party confirm loan', async () => {
-    //   await expect(contract.connect(user3).confirmLender(0)).to.be.revertedWith('You are not the lender of this loan')
-    // })
+    it('Should let borrower pay back loan', async () => {
+      const balanceBefore = await user1.getBalance()
+      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.5') })
+
+      const loan = await contract.getLoan(0)
+      const balanceAfter = await user1.getBalance()
+
+      expect(balanceAfter).to.equal(balanceBefore.add(ethers.utils.parseEther('.5')))
+    })
+
+    it('Should return collateral to borrower after payback', async () => {
+      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.5') })
+
+      const userCollateralBalance = await collateral.balanceOf(user2.address)
+      const contractCollateralBalance = await collateral.balanceOf(contract.address)
+
+      expect(userCollateralBalance).to.equal(1)
+      expect(contractCollateralBalance).to.equal(0)
+    })
+
+    it('Should execute loan after payback', async () => {
+      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.5') })
+
+      const loan = await contract.getLoan(0)
+
+      expect(loan.executed).to.equal(true)
+      expect(loan.active).to.equal(false)
+    })
+
   })
+
 });
