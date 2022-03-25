@@ -122,13 +122,15 @@ describe("LoanFactory contract", () => {
 
   describe('Past deadline', async () => {
 
+    const timestamp = Date.now() + 1
+
     beforeEach(async () => {
       await contract.submitLoan(
         user1.address, 
         user2.address, 
         ethers.utils.parseEther('.5'),
         { contractAddress: collateral.address, tokenId: 1 },
-        1648156728
+        timestamp
       )
 
       // Confirming lender
