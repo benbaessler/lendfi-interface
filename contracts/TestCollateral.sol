@@ -7,8 +7,8 @@ contract Collateral is ERC721 {
 
   constructor() ERC721("Collateral", "CLT") {}
 
-  function mint() public {
-    _safeMint(msg.sender, 1);
+  function mint(uint256 _id) public {
+    _safeMint(msg.sender, _id);
   }
 
 }
