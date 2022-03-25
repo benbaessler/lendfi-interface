@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "hardhat/console.sol";
 
 contract LoanFactory {
@@ -18,10 +18,11 @@ contract LoanFactory {
   event ConfirmLender(uint256 indexed id, address indexed lender);
   event ConfirmBorrower(uint256 indexed id, address indexed borrower);
 
+  event ActivateLoan(uint256 indexed id);
+
   event RevokeConfirmation(uint256 indexed id, address indexed revoker);
 
-  event ActivateLoan(uint256 indexed id);
-  event ExecuteLoan(uint256 indexed id);
+  event ExecuteLoan(uint256 indexed id, bool paidBack);
 
   struct Token {
     address contractAddress;
@@ -57,6 +58,16 @@ contract LoanFactory {
     _;
   }
 
+  modifier deadlineAhead(uint256 _id) {
+    require(loans[_id].deadline >= block.timestamp, "This loans deadline is exceeded");
+    _;
+  }
+
+  modifier isActive(uint256 _id) {
+    require(loans[_id].active, "This loan is not active");
+    _;
+  }
+
   modifier isLender(uint256 _id) {
     require(loans[_id].lender == msg.sender, "You are not the lender of this loan");
     _;
@@ -68,6 +79,9 @@ contract LoanFactory {
   }
 
   function submitLoan(address payable _lender, address _borrower, uint256 _amount, Token memory _collateral, uint256 _deadline) public returns (uint256) {
+    // Uncomment after tests are done
+    // require(_deadline > block.timestamp, "Deadline can not be in the past");
+
     uint256 id = loans.length;
 
     loans.push(
@@ -89,7 +103,7 @@ contract LoanFactory {
     return id;
   }
 
-  function confirmLender(uint256 _id) external payable loanExists(_id) notActive(_id) notExecuted(_id) isLender(_id) {
+  function confirmLender(uint256 _id) external payable loanExists(_id) notActive(_id) notExecuted(_id) isLender(_id) deadlineAhead(_id) {
     Loan storage loan = loans[_id];
 
     require(!loan.lenderConfirmed, "You already confirmed this loan");
@@ -103,7 +117,7 @@ contract LoanFactory {
     emit ConfirmLender(_id, msg.sender);
   }
 
-  function confirmBorrower(uint256 _id) public loanExists(_id) notActive(_id) notExecuted(_id) isBorrower(_id) {
+  function confirmBorrower(uint256 _id) public loanExists(_id) notActive(_id) notExecuted(_id) isBorrower(_id) deadlineAhead(_id) {
     Loan storage loan = loans[_id];
     require(!loan.borrowerConfirmed, "You already confirmed this loan");
     
@@ -128,10 +142,8 @@ contract LoanFactory {
     emit ActivateLoan(_id);
   }
 
-  function paybackLoan(uint256 _id) public payable loanExists(_id) notExecuted(_id) isBorrower(_id) {
+  function paybackLoan(uint256 _id) public payable loanExists(_id) isActive(_id) notExecuted(_id) isBorrower(_id) deadlineAhead(_id) {
     Loan storage loan = loans[_id];
-
-    require(loan.active, "Loan is not active");
     require(msg.value >= loan.amount, "You have not sent enough ETH");
 
     bool loanPaid = loan.lender.send(msg.value);
@@ -143,20 +155,35 @@ contract LoanFactory {
     loan.active = false;
     loan.executed = true;
 
-    emit ExecuteLoan(_id);
+    emit ExecuteLoan(_id, true);
+  }
+
+  function claimCollateral(uint256 _id) public loanExists(_id) isActive(_id) notExecuted(_id) isLender(_id) {
+    Loan storage loan = loans[_id];
+    require(block.timestamp >= loan.deadline, "Deadline not reached");
+
+    IERC721 collateral = IERC721(loan.collateral.contractAddress);
+    collateral.transferFrom(address(this), loan.lender, loan.collateral.tokenId);
+
+    loan.active = false;
+    loan.executed = true;
+
+    emit ExecuteLoan(_id, false);
+  }
+
+  function extendDeadline(uint256 _id, uint256 _newDeadline) public loanExists(_id) notExecuted(_id) isLender(_id) {
+    Loan storage loan = loans[_id];
+    require(_newDeadline > loan.deadline, "New deadline needs to be after current deadline");
+
+    loan.deadline = _newDeadline;
   }
 
   // Getters
-
   function getLoan(uint256 _id) public view loanExists(_id) returns (Loan memory) {
     Loan memory loan = loans[_id];
     require(loan.lender == msg.sender || loan.borrower == msg.sender, "You are not participating in this loan");
 
     return loans[_id];
-  }
-
-  function getContractBalance() public view returns (uint256) {
-    return address(this).balance;
   }
 
 }

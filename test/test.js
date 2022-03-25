@@ -23,7 +23,7 @@ describe("LoanFactory contract", () => {
       user2.address, 
       ethers.utils.parseEther('.5'),
       { contractAddress: collateral.address, tokenId: 1 },
-      1650572328
+      1658434728
     )
   })
 
@@ -41,10 +41,7 @@ describe("LoanFactory contract", () => {
       await contract.confirmLender(0, { value: ethers.utils.parseEther('.5') })
 
       const loan = await contract.getLoan(0)
-      const contractBalance = await contract.getContractBalance()
-
       expect(loan.lenderConfirmed).to.equal(true)
-      expect(contractBalance).to.equal(ethers.utils.parseEther('.5'))
     })
 
     it('Should let borrower confirm loan with collateral deposit', async () => {
