@@ -1,0 +1,42 @@
+.App {
+  padding-top: 100px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1 {
+  font-weight: 400;
+  font-size: 30px;
+}
+
+h2 {
+  font-weight: 400;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+p {
+  font-size: 12px;
+  opacity: .5;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 100ms;
+}
+
+.submitButton {
+  color: #61b5ff;
+  background-color: #271d91;
+  width: 210px;
+}
+
+.submitButton:hover {
+  background-color: #231a82;
+}

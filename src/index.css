@@ -1,7 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
 * {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
   color: white;
 }
 
 body {
-  background-color: #2f1369 !important;
+  background-color: #2b1c5c !important;
 }
+
+
+
+input {
+  font-size: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbYb7L0L7S2cia1h-TnnLBc6QHwcgzmtRVzw&usqp=CAU')
+} */

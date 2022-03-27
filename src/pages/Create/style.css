@@ -1,0 +1,85 @@
+.createContainer {
+  max-width: 850px;
+  width: 80%;
+  background-color: #1a1738;
+  padding: 30px 40px 70px 40px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.createTopContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.createContentContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.createSectionContainer {
+  width: 45%;
+}
+
+.roleSelection {
+  display: flex;
+  justify-content: space-between;
+}
+
+.roleButton {
+  box-sizing: border-box;
+  width: calc(50% - 5px);
+  border: 3px solid #460a94;
+  background-color: none;
+}
+
+.roleButton:hover {
+  border: 3px solid #3b0a7a;
+}
+
+.roleButton#roleSelected {
+  border: none;
+  background-color: #460a94; 
+}
+
+.amountContainer {
+  margin: 30px 0;
+}
+
+.input {
+  height: 40px;
+  background-color: #303030;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.addressContainer {
+  margin-bottom: 30px;
+}
+
+.collateralTopSection {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addButton {
+  background-color: #2b2b2b;
+  height: 25px;
+  width: 70px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: .1s
+}
+
+.addButton:hover {
+  background-color: #262626;
+}
