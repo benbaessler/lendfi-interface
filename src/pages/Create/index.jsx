@@ -1,7 +1,8 @@
 import './style.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
+import TokenModal from '../../components/TokenModal'
 
 export default function Create() {
 
@@ -9,6 +10,19 @@ export default function Create() {
 
   // Role input
   const [role, setRole] = useState()
+
+  const [lender, setLender] = useState()
+  const [borrower, setBorrower] = useState()
+
+  useEffect(() => {
+    if (role == 'Lender') { 
+      setLender(account) 
+      setBorrower('')
+    } else {
+      setBorrower(account)
+      setLender('')
+    }
+  }, [role])
 
   // Loan Amount input
   const [amountInput, setAmountInput] = useState()
@@ -27,6 +41,7 @@ export default function Create() {
 
   // Collateral
   const [collateral, setCollateral] = useState()
+  const [showModal, setShowModal] = useState(false)
 
   const connectWallet = async () => {
     try { await activate(injected) }
@@ -37,7 +52,9 @@ export default function Create() {
 
   }
 
-  return (
+  return <>
+    <TokenModal address={borrower} show={showModal} onClose={() => setShowModal(false)}/>
+
     <div className="createContainer">
 
       <div className="createTopContainer">
@@ -51,7 +68,7 @@ export default function Create() {
         <div className="createSectionContainer">
 
           <div className="roleContainer">
-            <h2>Select Role</h2>
+            <h3>Select Role</h3>
             <div className="roleSelection">
               <div onClick={() => setRole('Lender')} className="button roleButton" id={role == 'Lender' ? 'roleSelected' : ''}>
                 Lender
@@ -63,7 +80,7 @@ export default function Create() {
           </div>
 
           <div className="amountContainer">
-            <h2>Loan Amount</h2>
+            <h3>Loan Amount</h3>
             <div className="input">
               <input type="number" placeholder="0" value={amountInput} onChange={onAmountChange}/>
               ETH
@@ -71,7 +88,7 @@ export default function Create() {
           </div>
 
           <div className="deadlineContainer">
-            <h2>Deadline</h2>
+            <h3>Deadline</h3>
             <div className="input" style={{ marginBottom: '12px' }}>
               <input type="datetime-local"/>
             </div>
@@ -83,7 +100,7 @@ export default function Create() {
         <div className="createSectionContainer">
 
           <div className="addressContainer">
-            <h2>{role == 'Lender' ? 'Borrower Address' : 'Lender Address'}</h2>
+            <h3>{role == 'Lender' ? 'Borrower Address' : 'Lender Address'}</h3>
             <div className="input">
               <input type="text" value={addressInput} onChange={onAddressChange}/>
             </div>
@@ -91,19 +108,18 @@ export default function Create() {
 
           <div className="collateralContainer">
             <div className="collateralTopSection">
-              <h2>Collateral</h2>
+              <h3>Collateral</h3>
               <div className="valueAddCollateral">
-                <div className="addButton">
+                <div className="addButton" onClick={() => setShowModal(true)}>
                   Add
                 </div>
               </div>
+
             </div>
           </div>
 
         </div>
       </div>
-
-
     </div>   
-  )
+  </>
 }

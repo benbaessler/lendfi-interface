@@ -12,6 +12,12 @@ h1 {
 
 h2 {
   font-weight: 400;
+  font-size: 22px;
+  margin-left: 5px;
+}
+
+h3 {
+  font-weight: 400;
   font-size: 16px;
   margin-bottom: 12px;
 }

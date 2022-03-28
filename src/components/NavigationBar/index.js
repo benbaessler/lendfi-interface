@@ -12,16 +12,14 @@ export default function NavigationBar() {
     catch (error) { console.error(error) }
   }
 
-  return (
-    <div className="navigationBarContainer">
-      <img src={Logo} id="logo"/>
-      <div className="walletSection">
-        {active ? <div className="userContainer">
-          {shortenAddress(account)}
-        </div> : <div className="button submitButton" id="navbarConnectBtn" onClick={connectWallet}>
-          Connect Wallet
-        </div>}
-      </div>
+  return <div className="navigationBarContainer">
+    <img src={Logo} id="logo"/>
+    <div className="walletSection">
+      {active ? <div className="userContainer">
+        {shortenAddress(account)}
+      </div> : <div className="button submitButton" id="navbarConnectBtn" onClick={connectWallet}>
+        Connect Wallet
+      </div>}
     </div>
-  )
+  </div>
 }

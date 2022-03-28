@@ -8,12 +8,11 @@ function App() {
 
   const triedEager = useEagerConnect()
   useInactiveListener(!triedEager)
-  return (
-    <div className="App">
-      <NavigationBar/>
-      <Create/>
-    </div>
-  );
+  
+  return <div className="App">
+    <NavigationBar/>
+    <Create/>
+  </div>
 }
 
 export default App;
