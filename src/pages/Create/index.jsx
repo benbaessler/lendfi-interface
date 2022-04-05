@@ -13,25 +13,25 @@ export default function Create() {
   const [role, setRole] = useState()
 
   const [lender, setLender] = useState()
-  const [borrower, setBorrower] = useState()
+  const [borrower, setBorrower] = useState('')
 
   const [borrowerTokens, setBorrowerTokens] = useState([])
 
   useEffect(() => {
     if (role == 'Lender') { 
       setLender(account) 
-      setBorrower('')
+      setBorrower(null)
     } else {
       setBorrower(account)
-      setLender('')
+      setLender(null)
     }
   }, [role])
 
   useEffect(async () => {
-    if (borrower != '') {
+    if (borrower) {
       const tokens = await getTokens(borrower)
       setBorrowerTokens(tokens.ownedNfts)
-    }
+    } else setBorrowerTokens([])
   }, [borrower])
 
   // Loan Amount input
@@ -63,7 +63,11 @@ export default function Create() {
   }
 
   return <>
-    <TokenModal address={borrower} show={showModal} onClose={() => setShowModal(false)}/>
+    {borrowerTokens.length > 0 ? <TokenModal 
+      data={borrowerTokens}
+      show={showModal} 
+      onClose={() => setShowModal(false)}
+    /> : <div/>}
 
     <div className="createContainer">
 
@@ -80,10 +84,10 @@ export default function Create() {
           <div className="roleContainer">
             <h3>Select Role</h3>
             <div className="roleSelection">
-              <div onClick={() => setRole('Lender')} className="button roleButton" id={role == 'Lender' ? 'roleSelected' : ''}>
+              <div onClick={() => setRole('Lender')} className="button roleButton" id={role == 'Lender' ? 'roleSelected' : null}>
                 Lender
               </div>
-              <div onClick={() => setRole('Borrower')} className="button roleButton" id={role == 'Borrower' ? 'roleSelected' : ''}>
+              <div onClick={() => setRole('Borrower')} className="button roleButton" id={role == 'Borrower' ? 'roleSelected' : null}>
                 Borrower
               </div>
             </div>
@@ -116,11 +120,14 @@ export default function Create() {
             </div>
           </div>
 
-          <div className="collateralContainer">
+          <div className="collateralContainer" id={borrower ? 'shown' : 'hidden'}>
             <div className="collateralTopSection">
               <h3>Collateral</h3>
               <div className="valueAddCollateral">
-                <div className="addButton" onClick={() => setShowModal(true)}>
+                <div 
+                  className="addButton" 
+                  onClick={borrower ? () => setShowModal(true) : () => {}}
+                >
                   Add
                 </div>
               </div>

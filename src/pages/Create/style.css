@@ -83,3 +83,16 @@
 .addButton:hover {
   background-color: #262626;
 }
+
+.collateralContainer {
+  opacity: .6;
+  transition: .1s
+}
+
+#hidden .addButton:hover {
+  background-color: #2b2b2b;
+}
+
+#shown {
+  opacity: 1;
+}
