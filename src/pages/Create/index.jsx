@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
+import getTokens from '../../utils/getTokens'
 
 export default function Create() {
 
@@ -14,6 +15,8 @@ export default function Create() {
   const [lender, setLender] = useState()
   const [borrower, setBorrower] = useState()
 
+  const [borrowerTokens, setBorrowerTokens] = useState([])
+
   useEffect(() => {
     if (role == 'Lender') { 
       setLender(account) 
@@ -23,6 +26,13 @@ export default function Create() {
       setLender('')
     }
   }, [role])
+
+  useEffect(async () => {
+    if (borrower != '') {
+      const tokens = await getTokens(borrower)
+      setBorrowerTokens(tokens.ownedNfts)
+    }
+  }, [borrower])
 
   // Loan Amount input
   const [amountInput, setAmountInput] = useState()
