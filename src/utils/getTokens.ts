@@ -1,15 +1,10 @@
 import axios from 'axios'
 
-export default async function getTokens(address) {
+export default async function getTokens(address: string) {
 
   const baseUrl = `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/getNFTs/`
 
-  const config = {
-    method: 'get',
-    url: `${baseUrl}?owner=${address}`
-  }
-
-  const response = await axios(config)
+  const response = await axios.get(`${baseUrl}?owner=${address}`)
 
   // const options = {
   //   method: 'GET',

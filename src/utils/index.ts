@@ -1,6 +1,6 @@
 import { getAddress } from '@ethersproject/address'
 
-export function isAddress(value) {
+export function isAddress(value: string) {
   try {
     return getAddress(value)
   } catch {
@@ -8,7 +8,7 @@ export function isAddress(value) {
   }
 }
 
-export function shortenAddress(address, chars = 4) {
+export function shortenAddress(address: string, chars = 4) {
   if (address === '') return ''
   const parsed = isAddress(address)
   if (!parsed) {

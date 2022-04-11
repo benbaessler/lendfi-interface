@@ -16,7 +16,7 @@ export default function NavigationBar() {
     <img src={Logo} id="logo"/>
     <div className="walletSection">
       {active ? <div className="userContainer">
-        {shortenAddress(account)}
+        {shortenAddress(account!)}
       </div> : <div className="button submitButton" id="navbarConnectBtn" onClick={connectWallet}>
         Connect Wallet
       </div>}

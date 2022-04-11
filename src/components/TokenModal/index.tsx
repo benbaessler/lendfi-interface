@@ -1,12 +1,16 @@
 import './style.css'
 import Close from '../../assets/icons/close.png'
+import { AlchemyAPIToken } from '../../types'
 
-export default function TokenModal({ data, show, onClose }) {
+interface Props {
+  data: Array<AlchemyAPIToken>
+  show: boolean,
+  onClose: () => void
+}
 
-  const _token = {
-    image_url: data[0].media[0].gateway,
-    name: data[0].title,
-  }
+export default function TokenModal({ data, show, onClose }: Props) {
+
+  console.log(data)
 
   // const testToken = {
   //   image_url: 'https://lh3.googleusercontent.com/alxzTsKKU0U4nGkdLPxf7s45SSzKzTeewI_yqek9MEO7z2loQJ8tE6zL0eYjWxVwQigh_3Pt7Rq-2rNuZlf8B6t8eeChat56eTEUIg=w600',
@@ -15,7 +19,7 @@ export default function TokenModal({ data, show, onClose }) {
   //   floor: 2.8
   // }
 
-  const TokenCard = ({ data }) => {
+  const TokenCard = ({ data }: { data: AlchemyAPIToken }) => {
     return <div className="tokenContainer">
       <img src={data.media[0].gateway}/>
       <div className="tokenInfo">

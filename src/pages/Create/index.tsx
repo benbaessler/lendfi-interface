@@ -4,40 +4,43 @@ import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
+import { AlchemyAPIToken } from '../../types'
 
 export default function Create() {
 
   const { active, account, activate } = useWeb3React()
 
   // Role input
-  const [role, setRole] = useState()
+  const [role, setRole] = useState<string>()
 
-  const [lender, setLender] = useState()
-  const [borrower, setBorrower] = useState('')
+  const [lender, setLender] = useState<string>()
+  const [borrower, setBorrower] = useState<string>()
 
-  const [borrowerTokens, setBorrowerTokens] = useState([])
+  const [borrowerTokens, setBorrowerTokens] = useState<Array<AlchemyAPIToken>>([])
 
   useEffect(() => {
     if (role == 'Lender') { 
-      setLender(account) 
-      setBorrower(null)
+      setLender(account as string) 
+      setBorrower('')
     } else {
-      setBorrower(account)
-      setLender(null)
+      setBorrower(account as string)
+      setLender('')
     }
   }, [role])
 
-  useEffect(async () => {
+  useEffect(() => {
     if (borrower) {
-      const tokens = await getTokens(borrower)
-      setBorrowerTokens(tokens.ownedNfts)
+      // Update type!
+      getTokens(borrower).then((tokens: any) => {
+        setBorrowerTokens(tokens.ownedNfts)
+      })
     } else setBorrowerTokens([])
   }, [borrower])
 
   // Loan Amount input
   const [amountInput, setAmountInput] = useState()
 
-  const onAmountChange = event => {
+  const onAmountChange = (event: any) => {
     let input = event.target.value
     input.replace(',', '.')
 
@@ -47,7 +50,7 @@ export default function Create() {
   // Address input
   const [addressInput, setAddressInput] = useState()
 
-  const onAddressChange = event => setAddressInput(event.target.value)
+  const onAddressChange = (event: any) => setAddressInput(event.target.value)
 
   // Collateral
   const [collateral, setCollateral] = useState()
@@ -84,10 +87,10 @@ export default function Create() {
           <div className="roleContainer">
             <h3>Select Role</h3>
             <div className="roleSelection">
-              <div onClick={() => setRole('Lender')} className="button roleButton" id={role == 'Lender' ? 'roleSelected' : null}>
+              <div onClick={() => setRole('Lender')} className="button roleButton" id={role == 'Lender' ? 'roleSelected' : undefined}>
                 Lender
               </div>
-              <div onClick={() => setRole('Borrower')} className="button roleButton" id={role == 'Borrower' ? 'roleSelected' : null}>
+              <div onClick={() => setRole('Borrower')} className="button roleButton" id={role == 'Borrower' ? 'roleSelected' : undefined}>
                 Borrower
               </div>
             </div>

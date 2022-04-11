@@ -5,7 +5,7 @@ import App from './App';
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 
-const getLibrary = (provider) => {
+const getLibrary = (provider: any) => {
   return new Web3Provider(provider)
 }
 
