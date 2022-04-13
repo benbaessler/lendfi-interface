@@ -1,27 +1,42 @@
 import './style.css'
-import Close from '../../assets/icons/close.png'
+import { useState, useEffect } from 'react'
 import { AlchemyAPIToken } from '../../types'
+import Close from '../../assets/icons/close.png'
+import Checkmark from '../../assets/icons/checkmark.png'
 
 interface Props {
   data: Array<AlchemyAPIToken>
-  show: boolean,
+  show: boolean
   onClose: () => void
+}
+
+interface Token {
+  contract: string
+  tokenId: string
+}
+
+interface TokenCardProps {
+  data: AlchemyAPIToken
+  // selected: boolean
+  // set: () => void
 }
 
 export default function TokenModal({ data, show, onClose }: Props) {
 
-  console.log(data)
+  const TokenCard = ({ data }: TokenCardProps) => {
+    const [selected, setSelected] = useState<boolean>(false)
 
-  // const testToken = {
-  //   image_url: 'https://lh3.googleusercontent.com/alxzTsKKU0U4nGkdLPxf7s45SSzKzTeewI_yqek9MEO7z2loQJ8tE6zL0eYjWxVwQigh_3Pt7Rq-2rNuZlf8B6t8eeChat56eTEUIg=w600',
-  //   name: 'Psychedelics Anonymous Genesis #1234',
-  //   permalink: 'https://opensea.io/assets/0x75e95ba5997eb235f40ecf8347cdb11f18ff640b/1234',
-  //   floor: 2.8
-  // }
+    const tokenData: Token = {
+      contract: data.contract.address,
+      tokenId: data.id.tokenId
+    }
 
-  const TokenCard = ({ data }: { data: AlchemyAPIToken }) => {
-    return <div className="tokenContainer">
-      <img src={data.media[0].gateway}/>
+    return <div className="tokenContainer"
+      style={{ color: selected ? 'black' : 'white' }}
+      onClick={() => setSelected(!selected)}
+    >
+      <img id="selectedIcon" src={Checkmark} style={{ display: selected ? '' : 'none'}}/>
+      <img id="tokenImage" src={data.media[0].gateway} style={{ opacity: selected ? 1 : .8 }}/>
       <div className="tokenInfo">
         <p>{data.title}</p>
         {/* <p id="floorPrice">{data.floor} ETH</p> */}
@@ -37,7 +52,20 @@ export default function TokenModal({ data, show, onClose }: Props) {
       </div>
 
       <div className="modalContent">
-        {data.map(token => <TokenCard data={token}/>)}
+        {data.map((token: AlchemyAPIToken) => {
+          const tokenData: Token = {
+            contract: token.contract.address,
+            tokenId: token.id.tokenId
+          }
+
+          return(
+            <TokenCard 
+              data={token} 
+              // selected={selected == tokenData} 
+              // set={() => setSelected(tokenData)}
+            />
+          )
+        })}
       </div>
     </div>
   </div>

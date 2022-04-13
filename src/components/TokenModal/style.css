@@ -6,7 +6,6 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, .5);
-  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
@@ -67,6 +66,8 @@
 }
 
 .tokenContainer {
+  position: relative;
+  cursor: pointer;
   margin: 5px;
   display: flex;
   flex-direction: column;
@@ -76,11 +77,18 @@
   border-radius: 10px;
 }
 
-.tokenContainer img {
+#tokenImage {
   width: 250px;
   height: 250px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+}
+
+#selectedIcon {
+  position: absolute;
+  width: 30px;
+  top: 5px;
+  right: 5px;
 }
 
 .tokenContainer p {
@@ -93,6 +101,10 @@
   height: 50px;
   align-items: center;
   justify-content: space-between;
+}
+
+.tokenInfo p:hover { 
+  opacity: .9;
 }
 
 #floorPrice {

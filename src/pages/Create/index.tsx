@@ -40,6 +40,7 @@ export default function Create() {
   // Loan Amount input
   const [amountInput, setAmountInput] = useState()
 
+  // Fix later
   const onAmountChange = (event: any) => {
     let input = event.target.value
     input.replace(',', '.')
@@ -54,7 +55,7 @@ export default function Create() {
 
   // Collateral
   const [collateral, setCollateral] = useState()
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState<boolean>(false)
 
   const connectWallet = async () => {
     try { await activate(injected) }
