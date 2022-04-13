@@ -11,6 +11,7 @@ contract LoanFactory {
     address indexed lender,
     address indexed borrower,
     uint256 amount,
+    uint256 interest,
     Token collateral,
     uint256 deadline
   );
@@ -33,6 +34,7 @@ contract LoanFactory {
     address payable lender;
     address borrower;
     uint256 amount;
+    uint256 interest;
     Token collateral;
     uint256 deadline;
     bool lenderConfirmed;
@@ -78,7 +80,7 @@ contract LoanFactory {
     _;
   }
 
-  function submitLoan(address payable _lender, address _borrower, uint256 _amount, Token memory _collateral, uint256 _deadline) public returns (uint256) {
+  function submitLoan(address payable _lender, address _borrower, uint256 _amount, uint256 _interest, Token memory _collateral, uint256 _deadline) public returns (uint256) {
     // Uncomment after tests are done
     // require(_deadline > block.timestamp, "Deadline can not be in the past");
 
@@ -89,6 +91,7 @@ contract LoanFactory {
         lender: _lender,
         borrower: _borrower,
         amount: _amount,
+        interest: _interest,
         collateral: _collateral,
         deadline: _deadline,
         lenderConfirmed: false,
@@ -98,7 +101,7 @@ contract LoanFactory {
       })
     );
 
-    emit SubmitLoan(id, _lender, _borrower, _amount, _collateral, _deadline);
+    emit SubmitLoan(id, _lender, _borrower, _amount, _interest, _collateral, _deadline);
 
     return id;
   }
@@ -144,7 +147,7 @@ contract LoanFactory {
 
   function paybackLoan(uint256 _id) public payable loanExists(_id) isActive(_id) notExecuted(_id) isBorrower(_id) deadlineAhead(_id) {
     Loan storage loan = loans[_id];
-    require(msg.value >= loan.amount, "You have not sent enough ETH");
+    require(msg.value >= loan.amount + loan.interest, "You have not sent enough ETH");
 
     bool loanPaid = loan.lender.send(msg.value);
     require(loanPaid, "Something went wrong with the payment");
