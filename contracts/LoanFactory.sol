@@ -147,7 +147,7 @@ contract LoanFactory {
 
   function paybackLoan(uint256 _id) public payable loanExists(_id) isActive(_id) notExecuted(_id) isBorrower(_id) deadlineAhead(_id) {
     Loan storage loan = loans[_id];
-    require(msg.value >= loan.amount + loan.interest, "You have not sent enough ETH");
+    require(msg.value == loan.amount + loan.interest, "Please pay back the exact amount you owe");
 
     bool loanPaid = loan.lender.send(msg.value);
     require(loanPaid, "Something went wrong with the payment");
@@ -185,7 +185,6 @@ contract LoanFactory {
   function getLoan(uint256 _id) public view loanExists(_id) returns (Loan memory) {
     Loan memory loan = loans[_id];
     require(loan.lender == msg.sender || loan.borrower == msg.sender, "You are not participating in this loan");
-
     return loans[_id];
   }
 
