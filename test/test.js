@@ -22,6 +22,7 @@ describe("LoanFactory contract", () => {
       user1.address, 
       user2.address, 
       ethers.utils.parseEther('.5'),
+      ethers.utils.parseEther('.05'),
       { contractAddress: collateral.address, tokenId: 1 },
       1658434728
     )
@@ -91,16 +92,21 @@ describe("LoanFactory contract", () => {
 
     it('Should let borrower pay back loan', async () => {
       const balanceBefore = await user1.getBalance()
-      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.5') })
+      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.55') })
 
       const loan = await contract.getLoan(0)
       const balanceAfter = await user1.getBalance()
 
-      expect(balanceAfter).to.equal(balanceBefore.add(ethers.utils.parseEther('.5')))
+      expect(balanceAfter).to.equal(balanceBefore.add(ethers.utils.parseEther('.55')))
+    })
+    
+    it('Should throw error if borrower does not provide enough value', async () => {
+      await expect(contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.05') }))
+      .to.be.revertedWith('Please pay back the exact amount you owe')
     })
 
     it('Should return collateral to borrower after payback', async () => {
-      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.5') })
+      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.55') })
 
       const userCollateralBalance = await collateral.balanceOf(user2.address)
       const contractCollateralBalance = await collateral.balanceOf(contract.address)
@@ -110,7 +116,7 @@ describe("LoanFactory contract", () => {
     })
 
     it('Should execute loan after payback', async () => {
-      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.5') })
+      await contract.connect(user2).paybackLoan(0, { value: ethers.utils.parseEther('.55') })
 
       const loan = await contract.getLoan(0)
 
@@ -120,6 +126,7 @@ describe("LoanFactory contract", () => {
 
   })
 
+  // These tests do not work
   describe('Past deadline', async () => {
 
     const timestamp = Date.now() + 1
@@ -129,6 +136,7 @@ describe("LoanFactory contract", () => {
         user1.address, 
         user2.address, 
         ethers.utils.parseEther('.5'),
+        ethers.utils.parseEther('.05'),
         { contractAddress: collateral.address, tokenId: 1 },
         timestamp
       )
@@ -162,7 +170,7 @@ describe("LoanFactory contract", () => {
     })
 
     it('Should not let borrower pay back loan', async () => {
-      await expect(contract.connect(user2).paybackLoan(1, { value: ethers.utils.parseEther('.5') })).to.be.revertedWith('Past deadline')
+      await expect(contract.connect(user2).paybackLoan(1, { value: ethers.utils.parseEther('.55') })).to.be.revertedWith('Past deadline')
     })
 
   })
