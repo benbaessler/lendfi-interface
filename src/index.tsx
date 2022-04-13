@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
+import { GlobalStore } from './state/global'
 
 const getLibrary = (provider: any) => {
   return new Web3Provider(provider)
@@ -11,9 +12,11 @@ const getLibrary = (provider: any) => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <App />
-    </Web3ReactProvider>
+    <GlobalStore>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <App />
+      </Web3ReactProvider>
+    </GlobalStore>
   </React.StrictMode>,
   document.getElementById('root')
 );

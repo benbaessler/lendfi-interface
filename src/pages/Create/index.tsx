@@ -1,10 +1,11 @@
 import './style.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
 import { AlchemyAPIToken } from '../../types'
+import { CollateralContext } from '../../state/global'
 
 export default function Create() {
 
@@ -16,7 +17,36 @@ export default function Create() {
   const [lender, setLender] = useState<string>()
   const [borrower, setBorrower] = useState<string>()
 
-  const [borrowerTokens, setBorrowerTokens] = useState<Array<AlchemyAPIToken>>([])
+  const [borrowerTokens, setBorrowerTokens] = useState<AlchemyAPIToken[]>([])
+
+  // Loan Amount input
+  const [amountInput, setAmountInput] = useState()
+
+  // Fix later
+  const onAmountChange = (event: any) => {
+    let input = event.target.value
+    input.replace(',', '.')
+
+    setAmountInput(input)
+  }
+
+  // Address input
+  const [addressInput, setAddressInput] = useState()
+
+  const onAddressChange = (event: any) => setAddressInput(event.target.value)
+
+  // Collateral
+  const [collateral, setCollateral] = useContext(CollateralContext)
+  const [showModal, setShowModal] = useState<boolean>(false)
+
+  const connectWallet = async () => {
+    try { await activate(injected) }
+    catch (error) { console.error(error) }
+  }
+
+  const submitLoan = async () => {
+
+  }
 
   useEffect(() => {
     if (role == 'Lender') { 
@@ -37,34 +67,9 @@ export default function Create() {
     } else setBorrowerTokens([])
   }, [borrower])
 
-  // Loan Amount input
-  const [amountInput, setAmountInput] = useState()
-
-  // Fix later
-  const onAmountChange = (event: any) => {
-    let input = event.target.value
-    input.replace(',', '.')
-
-    setAmountInput(input)
-  }
-
-  // Address input
-  const [addressInput, setAddressInput] = useState()
-
-  const onAddressChange = (event: any) => setAddressInput(event.target.value)
-
-  // Collateral
-  const [collateral, setCollateral] = useState()
-  const [showModal, setShowModal] = useState<boolean>(false)
-
-  const connectWallet = async () => {
-    try { await activate(injected) }
-    catch (error) { console.error(error) }
-  }
-
-  const submitLoan = async () => {
-
-  }
+  useEffect(() => {
+    console.log(collateral)
+  }, [showModal])
 
   return <>
     {borrowerTokens.length > 0 ? <TokenModal 

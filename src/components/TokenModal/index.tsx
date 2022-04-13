@@ -1,6 +1,7 @@
 import './style.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { AlchemyAPIToken } from '../../types'
+import { CollateralContext } from '../../state/global';
 import Close from '../../assets/icons/close.png'
 import Checkmark from '../../assets/icons/checkmark.png'
 
@@ -23,17 +24,39 @@ interface TokenCardProps {
 
 export default function TokenModal({ data, show, onClose }: Props) {
 
+  const [collateral, setCollateral] = useContext(CollateralContext)
+
   const TokenCard = ({ data }: TokenCardProps) => {
-    const [selected, setSelected] = useState<boolean>(false)
+    let isSelected: boolean = false
+    collateral.forEach((token: AlchemyAPIToken) => {
+      if (data == token) isSelected = true
+    })
+
+    const [selected, setSelected] = useState<boolean>(isSelected)
 
     const tokenData: Token = {
       contract: data.contract.address,
       tokenId: data.id.tokenId
     }
 
+    const selectToken = () => {
+      const _collateral = collateral
+
+      if (selected) {
+        const itemIndex = _collateral.indexOf(data)
+        if (itemIndex > -1) _collateral.splice(itemIndex, 1)
+      } else {
+        _collateral.push(data)
+        onClose()
+      }
+
+      setCollateral(_collateral)
+      setSelected(!selected)
+    }
+
     return <div className="tokenContainer"
       style={{ color: selected ? 'black' : 'white' }}
-      onClick={() => setSelected(!selected)}
+      onClick={selectToken}
     >
       <img id="selectedIcon" src={Checkmark} style={{ display: selected ? '' : 'none'}}/>
       <img id="tokenImage" src={data.media[0].gateway} style={{ opacity: selected ? 1 : .8 }}/>
