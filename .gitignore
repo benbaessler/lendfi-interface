@@ -31,3 +31,7 @@ typechain
 #Hardhat files
 cache
 artifacts
+
+# Other
+.vscode
+package-lock.json
