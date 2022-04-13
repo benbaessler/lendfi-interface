@@ -1,5 +1,6 @@
 import './style.css'
 import { useState, useEffect, useContext } from 'react';
+import { utils, BigNumber } from 'ethers'
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
@@ -16,11 +17,26 @@ export default function Create() {
 
   const [lender, setLender] = useState<string>()
   const [borrower, setBorrower] = useState<string>()
-
   const [borrowerTokens, setBorrowerTokens] = useState<AlchemyAPIToken[]>([])
 
-  // Loan Amount input
-  const [amountInput, setAmountInput] = useState()
+  // Input
+  const [amountInput, setAmountInput] = useState<string>()
+  const [interestInput, setInterestInput] = useState<string>()
+  const [deadlineInput, setDeadlineInput] = useState()
+  const [addressInput, setAddressInput] = useState<string>()
+
+  // Collateral
+  const [collateral] = useContext(CollateralContext)
+  const [showModal, setShowModal] = useState<boolean>(false)
+
+  const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
+  
+  const onAddressChange = (event: any) => {
+    const input = event.target.value
+    if (role === 'Lender') {
+      setBorrower(input)
+    } else { setLender(input) }
+  }
 
   // Fix later
   const onAmountChange = (event: any) => {
@@ -30,14 +46,9 @@ export default function Create() {
     setAmountInput(input)
   }
 
-  // Address input
-  const [addressInput, setAddressInput] = useState()
-
-  const onAddressChange = (event: any) => setAddressInput(event.target.value)
-
-  // Collateral
-  const [collateral, setCollateral] = useContext(CollateralContext)
-  const [showModal, setShowModal] = useState<boolean>(false)
+  const onInterestChange = (event: any) => {
+    setInterestInput(event.target.value)
+  }
 
   const connectWallet = async () => {
     try { await activate(injected) }
@@ -45,11 +56,18 @@ export default function Create() {
   }
 
   const submitLoan = async () => {
-
+    // Parsing input data
+    const amountInWei = Number(utils.parseEther(amountInput as string))
+    const interestFee = Number(amountInWei) * Number(interestInput) / 100
+    const parsedCollateral = collateral.map((token: AlchemyAPIToken) => ({
+      contractAddress: token.contract.address,
+      tokenId: token.id.tokenId
+    }))
+    const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
   }
 
   useEffect(() => {
-    if (role == 'Lender') { 
+    if (role === 'Lender') { 
       setLender(account as string) 
       setBorrower('')
     } else {
@@ -61,8 +79,8 @@ export default function Create() {
   useEffect(() => {
     if (borrower) {
       // Update type!
-      getTokens(borrower).then((tokens: any) => {
-        setBorrowerTokens(tokens.ownedNfts)
+      getTokens(borrower).then((tokens: AlchemyAPIToken[]) => {
+        setBorrowerTokens(tokens)
       })
     } else setBorrowerTokens([])
   }, [borrower])
@@ -116,7 +134,7 @@ export default function Create() {
           <div className="amountContainer">
             <h3>Interest Rate</h3>
             <div className="input">
-              <input type="number" placeholder="0" value={amountInput} onChange={onAmountChange}/>
+              <input type="number" placeholder="0" value={interestInput} onChange={onInterestChange}/>
               %
             </div>
           </div>
@@ -124,7 +142,7 @@ export default function Create() {
           <div className="deadlineContainer">
             <h3>Deadline</h3>
             <div className="input" style={{ marginBottom: '12px' }}>
-              <input type="datetime-local"/>
+              <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>
             </div>
             <p>Note that the lender can extend the deadline at any time.</p>
           </div>
@@ -136,7 +154,9 @@ export default function Create() {
           <div className="addressContainer">
             <h3>{role == 'Lender' ? 'Borrower Address' : 'Lender Address'}</h3>
             <div className="input">
-              <input type="text" value={addressInput} onChange={onAddressChange}/>
+              <input type="text" 
+                value={role === 'Lender' ? borrower : lender} 
+                onChange={onAddressChange}/>
             </div>
           </div>
 
