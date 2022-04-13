@@ -4,7 +4,7 @@ import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
-import { AlchemyAPIToken } from '../../types'
+import { AlchemyAPIToken, TokenCardProps } from '../../types'
 import { CollateralContext } from '../../state/global'
 
 export default function Create() {
@@ -67,9 +67,15 @@ export default function Create() {
     } else setBorrowerTokens([])
   }, [borrower])
 
-  useEffect(() => {
-    console.log(collateral)
-  }, [showModal])
+  const CollateralToken = ({ data }: TokenCardProps) => {
+    return <div className="collatContainer">
+      <img id="collatImage" src={data.media[0].gateway}/>
+      <div className="collatInfo">
+        <p>{data.title}</p>
+        {/* <p id="floorPrice">{data.floor} ETH</p> */}
+      </div>
+    </div>
+  }
 
   return <>
     {borrowerTokens.length > 0 ? <TokenModal 
@@ -110,6 +116,14 @@ export default function Create() {
             </div>
           </div>
 
+          <div className="amountContainer">
+            <h3>Interest Rate</h3>
+            <div className="input">
+              <input type="number" placeholder="0" value={amountInput} onChange={onAmountChange}/>
+              %
+            </div>
+          </div>
+
           <div className="deadlineContainer">
             <h3>Deadline</h3>
             <div className="input" style={{ marginBottom: '12px' }}>
@@ -131,7 +145,7 @@ export default function Create() {
 
           <div className="collateralContainer" id={borrower ? 'shown' : 'hidden'}>
             <div className="collateralTopSection">
-              <h3>Collateral</h3>
+              <h3 style={{ margin: 0 }}>Collateral</h3>
               <div className="valueAddCollateral">
                 <div 
                   className="addButton" 
@@ -140,7 +154,9 @@ export default function Create() {
                   Add
                 </div>
               </div>
-
+            </div>
+            <div className="collateralDisplay">
+              {collateral.map((token: AlchemyAPIToken) => <CollateralToken data={token}/>)}
             </div>
           </div>
 

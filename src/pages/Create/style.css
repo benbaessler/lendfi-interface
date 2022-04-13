@@ -59,12 +59,14 @@
 }
 
 .addressContainer {
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .collateralTopSection {
   display: flex;
   justify-content: space-between;
+  align-items: end;
+  margin-bottom: 12px;
 }
 
 .addButton {
@@ -95,4 +97,37 @@
 
 #shown {
   opacity: 1;
+}
+
+.collateralDisplay {
+  width: 100%;
+  height: 210px;
+}
+
+.collatContainer {
+  background-color: #343434;
+  border-radius: 10px;
+  width: 170px;
+  height: 100%;
+}
+
+.collatContainer p {
+  font-size: 11px;
+  max-width: 65%;
+  opacity: .9;
+}
+
+#collatImage {
+  width: 170px;
+  height: 170px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.collatInfo {
+  padding: 0 10px;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
 }

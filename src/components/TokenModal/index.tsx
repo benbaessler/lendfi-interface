@@ -1,6 +1,6 @@
 import './style.css'
 import { useState, useEffect, useContext } from 'react'
-import { AlchemyAPIToken } from '../../types'
+import { AlchemyAPIToken, TokenCardProps } from '../../types'
 import { CollateralContext } from '../../state/global';
 import Close from '../../assets/icons/close.png'
 import Checkmark from '../../assets/icons/checkmark.png'
@@ -9,17 +9,6 @@ interface Props {
   data: Array<AlchemyAPIToken>
   show: boolean
   onClose: () => void
-}
-
-interface Token {
-  contract: string
-  tokenId: string
-}
-
-interface TokenCardProps {
-  data: AlchemyAPIToken
-  // selected: boolean
-  // set: () => void
 }
 
 export default function TokenModal({ data, show, onClose }: Props) {
@@ -33,11 +22,6 @@ export default function TokenModal({ data, show, onClose }: Props) {
     })
 
     const [selected, setSelected] = useState<boolean>(isSelected)
-
-    const tokenData: Token = {
-      contract: data.contract.address,
-      tokenId: data.id.tokenId
-    }
 
     const selectToken = () => {
       const _collateral = collateral
@@ -75,20 +59,7 @@ export default function TokenModal({ data, show, onClose }: Props) {
       </div>
 
       <div className="modalContent">
-        {data.map((token: AlchemyAPIToken) => {
-          const tokenData: Token = {
-            contract: token.contract.address,
-            tokenId: token.id.tokenId
-          }
-
-          return(
-            <TokenCard 
-              data={token} 
-              // selected={selected == tokenData} 
-              // set={() => setSelected(tokenData)}
-            />
-          )
-        })}
+        {data.map((token: AlchemyAPIToken) => <TokenCard data={token}/>)}
       </div>
     </div>
   </div>

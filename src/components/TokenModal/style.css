@@ -93,6 +93,7 @@
 
 .tokenContainer p {
   max-width: 65%;
+  opacity: .9;
 }
 
 .tokenInfo {
@@ -101,10 +102,6 @@
   height: 50px;
   align-items: center;
   justify-content: space-between;
-}
-
-.tokenInfo p:hover { 
-  opacity: .9;
 }
 
 #floorPrice {

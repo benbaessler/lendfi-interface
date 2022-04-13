@@ -20,3 +20,7 @@ interface AlchemyAPITokenMetadata {
   image: string
   name: string
 }
+
+interface TokenCardProps {
+  data: AlchemyAPIToken
+}
