@@ -12,7 +12,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .createContentContainer {
@@ -66,7 +66,16 @@
   display: flex;
   justify-content: space-between;
   align-items: end;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.collateralTitle {
+  display: flex;
+  align-items: center;
+}
+
+.collateralTitle h4 {
+  margin-left: 5px;
 }
 
 .addButton {
@@ -88,7 +97,8 @@
 
 .collateralContainer {
   opacity: .6;
-  transition: .1s
+  transition: .1s;
+  margin-bottom: 30px;
 }
 
 #hidden .addButton:hover {

@@ -1,5 +1,6 @@
 .App {
   padding-top: 100px;
+  padding-bottom: 50px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -20,6 +21,12 @@ h3 {
   font-weight: 400;
   font-size: 16px;
   margin-bottom: 12px;
+}
+
+h4 {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: .7;
 }
 
 p {
