@@ -1,16 +1,16 @@
 import './style.css'
 import { useState, useEffect, useContext } from 'react';
-import { utils, BigNumber } from 'ethers'
+import { utils, BigNumber, Contract, providers } from 'ethers'
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
-import { AlchemyAPIToken, TokenCardProps } from '../../types'
+import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
 import { CollateralContext } from '../../state/global'
+import LoanFactoryABI from '../../artifacts/contracts/LoanFactory.sol/LoanFactory.json'
 
 export default function Create() {
-
-  const { active, account, activate } = useWeb3React()
+  const { active, account, activate, connector, library } = useWeb3React()
 
   // Role input
   const [role, setRole] = useState<string>()
@@ -56,14 +56,24 @@ export default function Create() {
   }
 
   const submitLoan = async () => {
+    const provider = new providers.Web3Provider(library.provider)
+    const signer = provider.getSigner()
+
+    const factoryAddress = '0x16ae973088549AfA8520C39De102E965657600A9'
+    const factoryContract = new Contract(factoryAddress, LoanFactoryABI.abi, provider)
+
     // Parsing input data
-    const amountInWei = Number(utils.parseEther(amountInput as string))
-    const interestFee = Number(amountInWei) * Number(interestInput) / 100
-    const parsedCollateral = collateral.map((token: AlchemyAPIToken) => ({
+    const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
+    const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
+    const parsedCollateral: TokenStruct[] = collateral.map((token: AlchemyAPIToken) => ({
       contractAddress: token.contract.address,
-      tokenId: token.id.tokenId
+      tokenId: Number(token.id.tokenId)
     }))
     const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
+
+    await factoryContract.connect(signer).submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline)
+    console.log(BigNumber.from(amountInWei.toString()), BigNumber.from(interestFee.toString()))
+    console.log('Success')
   }
 
   useEffect(() => {

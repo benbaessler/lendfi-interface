@@ -8,11 +8,6 @@ async function main() {
   await contract.deployed();
 
   console.log("Contract deployed to:", contract.address);
-
-  const provider = providers.getDefaultProvider()
-  const [user1, user2] = await ethers.getSigners()
-
-  console.log(await contract.test())
 }
 
 main()

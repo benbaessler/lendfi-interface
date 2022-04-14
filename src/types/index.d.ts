@@ -24,3 +24,8 @@ interface AlchemyAPITokenMetadata {
 interface TokenCardProps {
   data: AlchemyAPIToken
 }
+
+interface TokenStruct {
+  contractAddress: string,
+  tokenId: number
+}

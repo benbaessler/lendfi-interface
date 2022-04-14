@@ -18,7 +18,7 @@ export default function TokenModal({ data, show, onClose }: Props) {
   const TokenCard = ({ data }: TokenCardProps) => {
     let isSelected: boolean = false
     collateral.forEach((token: AlchemyAPIToken) => {
-      if (data == token) isSelected = true
+      if (data === token) isSelected = true
     })
 
     const [selected, setSelected] = useState<boolean>(isSelected)

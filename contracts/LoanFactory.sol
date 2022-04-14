@@ -185,6 +185,7 @@ contract LoanFactory {
   function getLoan(uint256 _id) public view loanExists(_id) returns (Loan memory) {
     Loan memory loan = loans[_id];
     require(loan.lender == msg.sender || loan.borrower == msg.sender, "You are not participating in this loan");
+
     return loans[_id];
   }
 
