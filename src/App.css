@@ -45,11 +45,12 @@ p {
 }
 
 .submitButton {
-  color: #61b5ff;
-  background-color: #271d91;
-  width: 210px;
+  color: white;
+  background-color: #F900BF;
+  width: 210px !important;
+  transition: .2s;
 }
 
 .submitButton:hover {
-  background-color: #231a82;
+  background-color: #d104a1;
 }

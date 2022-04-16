@@ -115,6 +115,10 @@ export default function Create() {
 
       <div className="createTopContainer">
         <h1>Create Loan</h1>
+        <div className="button submitButton"
+          onClick={active ? submitLoan : connectWallet}
+          style={{ width: '100%' }}
+        >{active ? 'Submit Loan' : 'Connect Wallet'}</div>
       </div>
 
       <div className="createContentContainer">  
@@ -188,12 +192,6 @@ export default function Create() {
               {collateral.map((token: AlchemyAPIToken) => <CollateralToken data={token}/>)}
             </div>
           </div>
-
-          <div className="button submitButton"
-            onClick={active ? submitLoan : connectWallet}
-            style={{ width: '100%' }}
-          >{active ? 'Submit Loan' : 'Connect Wallet'}</div>
-
         </div>
       </div>
     </div>   

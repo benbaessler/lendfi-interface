@@ -1,10 +1,11 @@
 .createContainer {
   max-width: 850px;
   width: 80%;
-  background-color: #1a1738;
-  padding: 30px 40px 70px 40px;
+  background-color: rgba(0, 0, 0, .8);
+  padding: 30px 40px 35px 40px;
   border-radius: 10px;
   font-size: 16px;
+  position: relative;
 }
 
 .createTopContainer {
@@ -21,7 +22,7 @@
 }
 
 .createSectionContainer {
-  width: 45%;
+  width: 48%;
 }
 
 .roleSelection {
@@ -32,17 +33,17 @@
 .roleButton {
   box-sizing: border-box;
   width: calc(50% - 5px);
-  border: 3px solid #460a94;
+  border: 3px solid #9900F0;
   background-color: none;
 }
 
 .roleButton:hover {
-  border: 3px solid #3b0a7a;
+  border: 3px solid #9900F0;
 }
 
 .roleButton#roleSelected {
   border: none;
-  background-color: #460a94; 
+  background-color: #9900F0; 
 }
 
 .amountContainer {
@@ -66,7 +67,7 @@
   display: flex;
   justify-content: space-between;
   align-items: end;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .collateralTitle {
@@ -111,25 +112,26 @@
 
 .collateralDisplay {
   width: 100%;
-  height: 210px;
+  height: 250px;
+  display: flex;
 }
 
 .collatContainer {
   background-color: #343434;
   border-radius: 10px;
-  width: 170px;
+  width: 190px;
   height: 100%;
 }
 
 .collatContainer p {
-  font-size: 11px;
+  font-size: 12px;
   max-width: 65%;
   opacity: .9;
 }
 
 #collatImage {
-  width: 170px;
-  height: 170px;
+  width: 190px;
+  height: 190px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
