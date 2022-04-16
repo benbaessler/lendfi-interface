@@ -6,6 +6,7 @@ import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
+import { factoryAddress } from '../../constants'
 import { CollateralContext } from '../../state/global'
 import LoanFactoryABI from '../../artifacts/contracts/LoanFactory.sol/LoanFactory.json'
 
@@ -59,7 +60,6 @@ export default function Create() {
     const provider = new providers.Web3Provider(library.provider)
     const signer = provider.getSigner()
 
-    const factoryAddress = '0x16ae973088549AfA8520C39De102E965657600A9'
     const factoryContract = new Contract(factoryAddress, LoanFactoryABI.abi, provider)
 
     // Parsing input data
@@ -72,7 +72,6 @@ export default function Create() {
     const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
 
     await factoryContract.connect(signer).submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline)
-    console.log(BigNumber.from(amountInWei.toString()), BigNumber.from(interestFee.toString()))
     console.log('Success')
   }
 
