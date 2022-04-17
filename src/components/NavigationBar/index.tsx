@@ -14,6 +14,12 @@ export default function NavigationBar() {
 
   return <div className="navigationBarContainer">
     <img src={Logo} id="logo"/>
+
+    <div>
+      <span style={{ marginRight: '18px' }}>Loans</span>
+      <span>Create</span>
+    </div>
+
     <div className="walletSection">
       {active ? <div className="userContainer">
         {shortenAddress(account!)}

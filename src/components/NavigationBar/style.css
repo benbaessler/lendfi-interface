@@ -6,6 +6,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: .5s;
+}
+
+.navigationBarContainer:hover {
+  background-color: rgba(0, 0, 0, .2);
+}
+
+.navigationBarContainer span {
+  font-size: 15px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.navigationBarContainer span:hover {
+  opacity: .7;
 }
 
 #logo {
