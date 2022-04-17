@@ -3,9 +3,11 @@ import { injected } from '../../connectors'
 import Logo from '../../assets/icons/logo.png'
 import { useWeb3React } from "@web3-react/core"
 import { shortenAddress } from '../../utils'
+import { useHistory } from "react-router-dom";
 
 export default function NavigationBar() {
   const { active, account, activate } = useWeb3React()
+  const history = useHistory()
 
   const connectWallet = async () => {
     try { await activate(injected) }
@@ -13,11 +15,11 @@ export default function NavigationBar() {
   }
 
   return <div className="navigationBarContainer">
-    <img src={Logo} id="logo"/>
+    <img src={Logo} onClick={() => history.push('')} id="logo"/>
 
     <div>
-      <span style={{ marginRight: '18px' }}>Loans</span>
-      <span>Create</span>
+      <span style={{ marginRight: '18px' }} onClick={() => history.push('')}>Loans</span>
+      <span onClick={() => history.push('create')}>Create</span>
     </div>
 
     <div className="walletSection">
