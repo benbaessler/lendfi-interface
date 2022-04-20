@@ -29,3 +29,8 @@
   background-color: rgba(256, 256, 256, .1);
   border-radius: 7px;
 }
+
+#collateralViewBtn {
+  color: #1c92ff;
+  cursor: pointer;
+}
