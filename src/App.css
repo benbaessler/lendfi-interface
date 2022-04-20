@@ -46,11 +46,21 @@ p {
 
 .submitButton {
   color: white;
-  background-color: #F900BF;
+  background-color: #330d94;
   width: 210px !important;
   transition: .2s;
 }
 
 .submitButton:hover {
-  background-color: #d104a1;
+  background-color: #2b0980;
+}
+
+.interfaceContainer {
+  max-width: 850px;
+  width: 80%;
+  background-color: #110421;
+  padding: 30px 40px 35px 40px;
+  border-radius: 10px;
+  font-size: 16px;
+  position: relative;
 }

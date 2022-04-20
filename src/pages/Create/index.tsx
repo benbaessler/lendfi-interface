@@ -6,12 +6,14 @@ import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
-import { factoryAddress } from '../../constants'
 import { CollateralContext } from '../../state/global'
-import LoanFactoryABI from '../../artifacts/contracts/LoanFactory.sol/LoanFactory.json'
+import { getContract } from '../../utils/contract';
+import { factoryAddress } from '../../constants';
 
 export default function Create() {
-  const { active, account, activate, connector, library } = useWeb3React()
+  const { active, account, activate, library } = useWeb3React()
+  let provider: providers.Web3Provider
+  let signer: providers.JsonRpcSigner
 
   // Role input
   const [role, setRole] = useState<string>()
@@ -57,11 +59,7 @@ export default function Create() {
   }
 
   const submitLoan = async () => {
-    const provider = new providers.Web3Provider(library.provider)
-    const signer = provider.getSigner()
-
-    const factoryContract = new Contract(factoryAddress, LoanFactoryABI.abi, provider)
-
+    const factoryContract = getContract(library.provider)
     // Parsing input data
     const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
     const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
@@ -94,6 +92,13 @@ export default function Create() {
     } else setBorrowerTokens([])
   }, [borrower])
 
+  useEffect(() => {
+    if (active) {
+      provider = new providers.Web3Provider(library.provider)
+      signer = provider.getSigner()
+    }
+  }, [active])
+
   const CollateralToken = ({ data }: TokenCardProps) => {
     return <div className="collatContainer">
       <img id="collatImage" src={data.media[0].gateway}/>
@@ -111,7 +116,7 @@ export default function Create() {
       onClose={() => setShowModal(false)}
     /> : <div/>}
 
-    <div className="createContainer">
+    <div className="interfaceContainer">
 
       <div className="createTopContainer">
         <h1>Create Loan</h1>

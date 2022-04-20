@@ -1,0 +1,9 @@
+#loanUiTitle {
+  margin-bottom: 40px;
+}
+
+.loanSectionTitle {
+  display: flex;
+  width: 95%;
+  justify-content: space-between;
+}

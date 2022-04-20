@@ -1,13 +1,3 @@
-.createContainer {
-  max-width: 850px;
-  width: 80%;
-  background-color: rgba(0, 0, 0, .8);
-  padding: 30px 40px 35px 40px;
-  border-radius: 10px;
-  font-size: 16px;
-  position: relative;
-}
-
 .createTopContainer {
   width: 100%;
   display: flex;
@@ -33,17 +23,17 @@
 .roleButton {
   box-sizing: border-box;
   width: calc(50% - 5px);
-  border: 3px solid #9900F0;
+  border: 2.5px solid #330d94;
   background-color: none;
 }
 
 .roleButton:hover {
-  border: 3px solid #9900F0;
+  border: 2.5px solid #2b0980;
 }
 
 .roleButton#roleSelected {
   border: none;
-  background-color: #9900F0; 
+  background-color: #330d94; 
 }
 
 .amountContainer {
