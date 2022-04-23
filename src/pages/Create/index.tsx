@@ -85,7 +85,6 @@ export default function Create() {
 
   useEffect(() => {
     if (borrower) {
-      // Update type!
       getTokens(borrower).then((tokens: AlchemyAPIToken[]) => {
         setBorrowerTokens(tokens)
       })

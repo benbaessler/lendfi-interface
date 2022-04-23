@@ -1,4 +1,5 @@
 import { getAddress } from '@ethersproject/address'
+import { providers } from 'ethers'
 
 export function isAddress(value: string) {
   try {

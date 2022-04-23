@@ -16,13 +16,14 @@
 .navigationBarContainer span {
   font-size: 15px;
   color: white;
+  opacity: .7;
   font-weight: 600;
   cursor: pointer;
   transition: .2s;
 }
 
 .navigationBarContainer span:hover {
-  opacity: .7;
+  opacity: 1;
 }
 
 #logo {

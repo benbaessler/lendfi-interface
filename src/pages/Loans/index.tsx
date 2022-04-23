@@ -4,6 +4,7 @@ import { providers, utils } from 'ethers'
 import { getContract } from '../../utils/contract'
 import { useEffect, useState } from 'react'
 import { Loan } from '../../types/loan'
+import { shortenAddress } from '../../utils'
 
 /*
 Parameters:
@@ -23,14 +24,23 @@ export default function Loans() {
   const { active, library, account } = useWeb3React()
   let provider: providers.Web3Provider
   let signer: providers.JsonRpcSigner
-  const [hasSigner, setHasSigner] = useState<boolean>(false)
+  // const [hasSigner, setHasSigner] = useState<boolean>(false)
 
   const [loans, setLoans] = useState<Loan[]>([])
 
   const _getLoan = async () => {
     const factoryContract = getContract(signer)
+    // Change later
     const loan = await factoryContract.getLoan(0)
     setLoans([loan])
+  }
+
+  const formatUser = async (address: string): Promise<string> => {
+    const ensName = await provider.lookupAddress(address)
+    const shortAddress = shortenAddress(address)
+
+    if (ensName) return ensName
+    return shortAddress
   }
 
   useEffect(() => {
@@ -41,16 +51,12 @@ export default function Loans() {
     }
   }, [active])
 
-  useEffect(() => {
-
-  }, [hasSigner])
-
   const LoanComponent = ({ data }: LoanComponentProps) => {    
     const formattedDeadline = new Date(data.deadline * 1000)
+    const [userDisplay, setUserDisplay] = useState<string>()
 
     let status: string
     let statusColor: string
-
     if (data.active) {
       status = 'Active'
       statusColor = '#14c443'
@@ -61,6 +67,21 @@ export default function Loans() {
       status = 'Initialized'
       statusColor = 'white'
     }
+
+    const _setUserDisplay = async () => {
+      let param: string
+      if (account === data.lender) param = data.borrower
+      else param = data.lender
+
+      const response = await formatUser(param)
+      setUserDisplay(response)
+      console.log(response, userDisplay)
+    }
+
+    useEffect(() => { 
+      // if (provider) console.log(true) 
+      console.log(provider)
+    }, [provider])
 
     return (
       <div className="loanContainer">
