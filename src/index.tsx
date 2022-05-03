@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
-import { GlobalStore } from './state/global'
+import { GlobalStore } from './state'
 import { BrowserRouter } from 'react-router-dom';
 
 const getLibrary = (provider: any) => {

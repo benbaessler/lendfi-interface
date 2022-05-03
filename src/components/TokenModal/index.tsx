@@ -1,7 +1,7 @@
 import './style.css'
 import { useState, useEffect, useContext } from 'react'
 import { AlchemyAPIToken, TokenCardProps } from '../../types'
-import { CollateralContext } from '../../state/global';
+import { CollateralContext } from '../../state/collateral';
 import Close from '../../assets/icons/close.png'
 import Checkmark from '../../assets/icons/checkmark.png'
 

@@ -6,14 +6,21 @@ import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
 import getTokens from '../../utils/getTokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
-import { CollateralContext } from '../../state/global'
-import { getContract } from '../../utils/contract';
+import { CollateralContext } from '../../state/collateral'
+import getContract from '../../utils/getContract';
 import { factoryAddress } from '../../constants';
 
 export default function Create() {
   const { active, account, activate, library } = useWeb3React()
   let provider: providers.Web3Provider
   let signer: providers.JsonRpcSigner
+
+  useEffect(() => {
+    if (active) {
+      provider = new providers.Web3Provider(library.provider)
+      signer = provider.getSigner()
+    }
+  }, [active])
 
   // Role input
   const [role, setRole] = useState<string>()
@@ -90,13 +97,6 @@ export default function Create() {
       })
     } else setBorrowerTokens([])
   }, [borrower])
-
-  useEffect(() => {
-    if (active) {
-      provider = new providers.Web3Provider(library.provider)
-      signer = provider.getSigner()
-    }
-  }, [active])
 
   const CollateralToken = ({ data }: TokenCardProps) => {
     return <div className="collatContainer">

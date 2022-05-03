@@ -1,38 +1,44 @@
 import './style.css'
 import { useWeb3React } from '@web3-react/core'
 import { providers, utils } from 'ethers'
-import { getContract } from '../../utils/contract'
+import getContract from '../../utils/getContract'
 import { useEffect, useState } from 'react'
 import { Loan } from '../../types/loan'
 import { shortenAddress } from '../../utils'
 
 /*
-Parameters:
-Type: (to/from)
-User
-Amount
-Collateral: View Popup
-Status
-Deadline
-Interest
-Dashboard button
+  Parameters:
+  Type: (to/from)
+  User
+  Amount
+  Collateral: View Popup
+  Status
+  Deadline
+  Interest
+  Dashboard button
 */
 
 interface LoanComponentProps { data: Loan }
 
 export default function Loans() {
-  const { active, library, account } = useWeb3React()
+  const { active, account, activate, library } = useWeb3React()
   let provider: providers.Web3Provider
   let signer: providers.JsonRpcSigner
-  // const [hasSigner, setHasSigner] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (active) {
+      provider = new providers.Web3Provider(library.provider)
+      signer = provider.getSigner()
+    }
+  }, [active])
 
   const [loans, setLoans] = useState<Loan[]>([])
 
-  const _getLoan = async () => {
+  const getLoans = async () => {
     const factoryContract = getContract(signer)
     // Change later
-    const loan = await factoryContract.getLoan(0)
-    setLoans([loan])
+    const loans = await factoryContract.getSenderLoans()
+    setLoans(loans)
   }
 
   const formatUser = async (address: string): Promise<string> => {
@@ -45,9 +51,7 @@ export default function Loans() {
 
   useEffect(() => {
     if (active) {
-      provider = new providers.Web3Provider(library.provider)
-      signer = provider.getSigner()
-      _getLoan()
+      getLoans()
     }
   }, [active])
 
