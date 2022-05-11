@@ -1,2 +1,3 @@
-// Goerli testnet address
-export const factoryAddress = '0x16ae973088549AfA8520C39De102E965657600A9'
+// Goerli testnet address: 0x16ae973088549AfA8520C39De102E965657600A9
+// Rinkeby testnet address: 0xA9500381dE560A6319D7956f92654778dE996F3e
+export const factoryAddress = '0xA9500381dE560A6319D7956f92654778dE996F3e'

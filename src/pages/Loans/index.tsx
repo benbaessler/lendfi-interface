@@ -1,6 +1,6 @@
 import './style.css'
 import { useWeb3React } from '@web3-react/core'
-import { providers, utils } from 'ethers'
+import { providers, utils, Signer } from 'ethers';
 import getContract from '../../utils/getContract'
 import { useEffect, useState } from 'react'
 import { Loan } from '../../types/loan'
@@ -22,13 +22,11 @@ interface LoanComponentProps { data: Loan }
 
 export default function Loans() {
   const { active, account, activate, library } = useWeb3React()
-  let provider: providers.Web3Provider
-  let signer: providers.JsonRpcSigner
+  let signer: Signer
 
   useEffect(() => {
     if (active) {
-      provider = new providers.Web3Provider(library.provider)
-      signer = provider.getSigner()
+      signer = library.getSigner()
     }
   }, [active])
 
@@ -42,7 +40,7 @@ export default function Loans() {
   }
 
   const formatUser = async (address: string): Promise<string> => {
-    const ensName = await provider.lookupAddress(address)
+    const ensName = await library.lookupAddress(address)
     const shortAddress = shortenAddress(address)
 
     if (ensName) return ensName
@@ -81,11 +79,6 @@ export default function Loans() {
       setUserDisplay(response)
       console.log(response, userDisplay)
     }
-
-    useEffect(() => { 
-      // if (provider) console.log(true) 
-      console.log(provider)
-    }, [provider])
 
     return (
       <div className="loanContainer">
