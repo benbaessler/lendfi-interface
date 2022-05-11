@@ -84,7 +84,7 @@ export default function Loans() {
       <div className="loanContainer">
         <div className="loanContentContainer">
           <p>{account === data.lender ? 'To' : 'From'}</p>
-          <p>{account === data.lender ? data.borrower : data.lender}</p>
+          <p>{account === data.lender ? shortenAddress(data.borrower, 3) : shortenAddress(data.lender, 3)}</p>
           <p>{utils.formatEther(data.amount)} ETH</p>
           <p>{utils.formatEther(data.interest)}</p>
           <p id="collateralViewBtn">View</p>
@@ -98,12 +98,12 @@ export default function Loans() {
   return <div className="interfaceContainer">
     <h1 id="loanUiTitle">Your Loans</h1>
     <div className="loanSectionTitle">
-      <p>Type</p>
-      <p>User</p>
-      <p>Amount</p>
-      <p>Interest</p>
-      <p>Collateral</p>
-      <p>Status</p>
+      <p style={{ marginRight: '13%' }}>Type</p>
+      <p style={{ marginRight: '14%' }}>User</p>
+      <p style={{ marginRight: '10%' }}>Amount</p>
+      <p style={{ marginRight: '9%' }}>Interest</p>
+      <p style={{ marginRight: '10%' }}>Collateral</p>
+      <p style={{ marginRight: '19%' }}>Status</p>
       <p>Deadline</p>
     </div>
     {loans.map((loan: Loan) => <LoanComponent data={loan}/>)}

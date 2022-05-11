@@ -4,9 +4,9 @@
 
 .loanSectionTitle {
   display: flex;
-  width: 92%;
-  justify-content: space-between;
-  padding-left: 15px;
+  width: 74%;
+  /* justify-content: space-between; */
+  padding-left: 12px;
   margin-bottom: 15px;
 }
 
