@@ -1,6 +1,6 @@
 import './style.css'
 import { useState, useEffect, useContext } from 'react';
-import { utils, BigNumber, Contract, providers } from 'ethers'
+import { utils, BigNumber, Signer, providers, Contract } from 'ethers';
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
@@ -9,18 +9,10 @@ import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
 import { CollateralContext } from '../../state/collateral'
 import getContract from '../../utils/getContract';
 import { factoryAddress } from '../../constants';
+import LoanFactoryABI from '../../artifacts/contracts/LoanFactory.sol/LoanFactory.json'
 
 export default function Create() {
   const { active, account, activate, library } = useWeb3React()
-  let provider: providers.Web3Provider
-  let signer: providers.JsonRpcSigner
-
-  useEffect(() => {
-    if (active) {
-      provider = new providers.Web3Provider(library.provider)
-      signer = provider.getSigner()
-    }
-  }, [active])
 
   // Role input
   const [role, setRole] = useState<string>()
@@ -66,7 +58,7 @@ export default function Create() {
   }
 
   const submitLoan = async () => {
-    const factoryContract = getContract(library.provider)
+    const factoryContract = new Contract(factoryAddress, LoanFactoryABI.abi, library.getSigner())
     // Parsing input data
     const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
     const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
@@ -76,8 +68,8 @@ export default function Create() {
     }))
     const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
 
-    await factoryContract.connect(signer).submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline)
-    console.log('Success')
+    await factoryContract.submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline)
+    console.log('Successfully submitted a new loan')
   }
 
   useEffect(() => {
