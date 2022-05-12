@@ -4,14 +4,9 @@ import { AlchemyAPIToken, TokenCardProps } from '../../types'
 import { CollateralContext } from '../../state/collateral';
 import Close from '../../assets/icons/close.png'
 import Checkmark from '../../assets/icons/checkmark.png'
+import { ModalProps } from '../../types/modal';
 
-interface Props {
-  data: Array<AlchemyAPIToken>
-  show: boolean
-  onClose: () => void
-}
-
-export default function TokenModal({ data, show, onClose }: Props) {
+export default function TokenModal({ data, show, onClose }: ModalProps) {
 
   const [collateral, setCollateral] = useContext(CollateralContext)
 
