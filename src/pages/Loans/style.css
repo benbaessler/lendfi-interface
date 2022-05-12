@@ -3,23 +3,32 @@
 }
 
 .loanSectionTitle {
+  position: relative;
   display: flex;
-  width: 74%;
+  width: 90%;
   /* justify-content: space-between; */
   padding-left: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 
 .loanContentContainer {
+  position: relative;
   padding-left: 15px;
   display: flex;
-  width: 92%;
+  width: 90%;
   height: 100%;
-  justify-content: space-between; 
+  /* justify-content: space-between;  */
   align-items: center;
 }
 
+.loanSectionTitle p {
+  position: absolute;
+  text-align: center;
+}
+
 .loanContentContainer p {
+  text-align: center;
+  position: absolute;
   opacity: 1;
 }
 
@@ -28,9 +37,43 @@
   width: 100%;
   background-color: rgba(256, 256, 256, .1);
   border-radius: 7px;
+  transition: .2s;
+  cursor: pointer;
 }
 
-#collateralViewBtn {
+.loanContainer:hover {
+  background-color: rgba(256, 256, 256, .05);
+}
+
+.collateralViewBtn {
   color: #1c92ff;
   cursor: pointer;
+}
+
+#c-1 {
+  left: 2%;
+}
+
+#c-2 {
+  left: 10%;
+}
+
+#c-3 {
+  left: 27%;
+}
+
+#c-4 {
+  left: 40%;
+}
+
+#c-5 {
+  left: 54%;
+}
+
+#c-6 {
+  left: 69%;
+}
+
+#c-7 {
+  left: 80%;
 }
