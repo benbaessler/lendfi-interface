@@ -33,6 +33,8 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   const [confirmBtnText, setConfirmBtnText] = useState<string>('Confirm Loan')
   const [confirmBtnStatus, setConfirmBtnStatus] = useState<boolean>(true)
 
+  const [claimActive, setClaimActive] = useState<boolean>(false)
+
   const [deadlineInput, setDeadlineInput] = useState<string>('')
   const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
 
@@ -69,6 +71,10 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     })
   }
 
+  const claimCollateral = async () => {
+    
+  }
+
   const extendDeadline = async () => {
     const factoryContract = getContract(library.getSigner())
 
@@ -95,6 +101,8 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       setConfirmBtnText('Confirmed')
       setConfirmBtnStatus(false)
     }
+
+    if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && !_loan.executed) setClaimActive(true)
 
     setLoading(false)
   }
@@ -146,24 +154,40 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           </div>
         </div>
         <div className="dbManageSection">
-          <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
-          <p>{loan!.lender === account ? 
-            `Confirm the Loan by transferring ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
-            `Confirm the Loan by transferring the Collateral NFT(s) to the Loan Contract.`
-          }</p>
-          <div 
-            className="button submitButton dbButton" 
-            id={!confirmBtnStatus ? 'disabled' : ''}
-            onClick={confirmBtnStatus ? loan!.lender === account ? confirmLender : () => confirmBorrower(loan!) : () => {}}
-          >{confirmBtnText}</div>
-          <h3>Extend Deadline</h3>
-          <div className="input" style={{ height: '35px', marginBottom: '12px' }}>
-            <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>
+          <div>
+            <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
+            <p>{loan!.lender === account ? 
+              `Confirm the Loan by transferring ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
+              `Confirm the Loan by transferring the Collateral NFT(s) to the Loan Contract.`
+            }</p>
+            <div 
+              className="button submitButton dbButton" 
+              id={!confirmBtnStatus ? 'disabled' : ''}
+              onClick={confirmBtnStatus ? loan!.lender === account ? confirmLender : () => confirmBorrower(loan!) : () => {}}
+            >{confirmBtnText}</div>
           </div>
-          <div 
-            className="button submitButton dbButton" 
-            onClick={extendDeadline}
+
+          <div>
+            <h3>Claim Collateral</h3>
+            <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
+            <div 
+              className="button submitButton dbButton" 
+              id={!claimActive ? 'disabled' : ''}
+              onClick={claimActive ? claimCollateral : () => {}}
+            >Claim</div>
+          </div>
+          
+          <div>
+            <h3>Extend Deadline</h3>
+            <div className="input" style={{ height: '35px', marginBottom: '12px' }}>
+              <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>
+            </div>
+            <div 
+              className="button submitButton dbButton" 
+              onClick={extendDeadline}
           >Update</div>
+          </div>
+
         </div>
       </div>
 
