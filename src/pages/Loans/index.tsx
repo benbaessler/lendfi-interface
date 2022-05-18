@@ -5,7 +5,6 @@ import getContract from '../../utils/getContract'
 import { useEffect, useState } from 'react'
 import { Loan } from '../../types/loan'
 import { shortenAddress } from '../../utils'
-import LoanDetails from '../../components/LoanDetails'
 
 /*
   Parameters:
@@ -58,8 +57,6 @@ export default function Loans() {
     const formattedDeadline = new Date(data.deadline * 1000)
     const [userDisplay, setUserDisplay] = useState<string>()
 
-    const [showDetails, setShowDetails] = useState<boolean>(false)
-
     let status: string
     let statusColor: string
     if (data.active) {
@@ -85,8 +82,7 @@ export default function Loans() {
 
     return (
       <>
-        <LoanDetails data={data} show={showDetails} onClose={() => setShowDetails(false)}/>
-        <div className="loanContainer" onClick={() => setShowDetails(true)}>
+        <div className="loanContainer">
           <div className="loanContentContainer">
             <p id="c-1">{account === data.lender ? 'To' : 'From'}</p>
             <p id="c-2">{account === data.lender ? shortenAddress(data.borrower, 3) : shortenAddress(data.lender, 3)}</p>
