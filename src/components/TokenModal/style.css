@@ -1,18 +1,3 @@
-.modal {
-  overflow-y: initial;
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  /* background-color: rgba(0, 0, 0, .5); */
-  backdrop-filter: blur(4px);
-  transition: .2s;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
 .tokenModalContainer {
   max-height: 700px;
   height: 80%;
@@ -45,20 +30,6 @@
 
 .modalHeader {
   margin-bottom: 35px;
-}
-
-#closeIcon {
-  width: 20px;
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  cursor: pointer;
-  opacity: .6;
-  transition: .2s;
-}
-
-#closeIcon:hover {
-  opacity: 1;
 }
 
 .modalContent {
