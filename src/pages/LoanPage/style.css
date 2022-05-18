@@ -1,5 +1,5 @@
 .dashboardWrapper {
-  min-height: 400px;
+  min-height: 450px;
 }
 
 .dashboardWrapper h3 {
@@ -12,10 +12,6 @@
   font-size: 17px !important;
   font-weight: 400 !important;
   opacity: .8;
-}
-
-.dbTitleContainer {
-  margin-bottom: 30px;
 }
 
 #dbTitle {
@@ -35,8 +31,13 @@
   margin-right: 10px;
 }
 
+.dbTitleContainer {
+  margin-bottom: 25px;
+  width: 100%;
+}
+
 .dbDetailsContainer {
-  width: 60%;
+  width: 55%;
   display: flex;
   flex-wrap: wrap;
   padding-right: 20px;
@@ -56,4 +57,26 @@
 
 .dbDetailSection a:hover {
   color: #b3e2ff;
+}
+
+.dbContentWrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.dbManageSection {
+  padding-top: 25px;
+  width: 45%;
+  height: 100%;
+}
+
+.dbManageSection h3 {
+  font-size: 17px !important;
+  margin-bottom: 12px !important;
+}
+
+.dbManageSection p {
+  width: 80%;
+  margin-bottom: 12px !important;
 }

@@ -4,7 +4,7 @@ import { RouteComponentProps, useParams, Redirect } from "react-router-dom"
 import getContract from '../../utils/getContract'
 import { useWeb3React } from '@web3-react/core'
 import { Loan } from '../../types/loan'
-import { formatDeadline, getStatusDetails } from '../../utils/loanDetails'
+import { formatDeadline, getStatusDetails, getConfirmations } from '../../utils/loanDetails'
 import { Spinner } from 'react-bootstrap'
 import { shortenAddress } from '../../utils'
 import { utils } from 'ethers'
@@ -21,16 +21,32 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   const [loading, setLoading] = useState<boolean>(true)
 
-  const { active, library } = useWeb3React()
+  const { account, active, library } = useWeb3React()
   const [loan, setLoan] = useState<Loan>()
 
   // Loan Details
   const [statusDetails, setStatusDetails] = useState<string[]>()
 
+  const confirmLender = async () => {
+    const factoryContract = getContract(library.getSigner())
+    await factoryContract.confirmLender(loanId, { value: loan!.amount })
+
+    console.log(`Successfully confirmed Loan by depositing ${utils.formatEther(loan!.amount)} ETH into the Loan Contract!`)
+  }
+
+  const confirmBorrower = async () => {
+    const factoryContract = getContract(library.getSigner())
+    await factoryContract.confirmBorrower(loanId)
+
+    console.log(`Successfully confirmed Loan by transferring 1 NFT to the Loan Contract!`)
+  }
+
   const init = async () => {
     const factoryContract = getContract(library.getSigner())
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
+
+    // console.log(_loan)
 
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
@@ -47,37 +63,57 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       position: 'absolute',
       right: '50%',
       bottom: '50%',
-    }}/> : <div>
-      <div className="dbTitleContainer">
-        <h1 id="dbTitle">Manage Loan</h1>
-        <div className="statusContainer">
-          <div id="statusIndicator" style={{ backgroundColor: statusDetails![1] }}/>
-          <span id="statusTitle">{statusDetails![0]}</span>
+    }}/> : <div className="dashboardContainer">
+      
+      <div className="dbContentWrapper">
+        <div className="dbDetailsContainer">
+          <div className="dbTitleContainer">
+            <h1 id="dbTitle">Manage Loan</h1>
+            <div className="statusContainer">
+              <div id="statusIndicator" style={{ backgroundColor: statusDetails![1] }}/>
+              <span id="statusTitle">{statusDetails![0]}</span>
+            </div>
+          </div>
+          <div className="dbDetailSection">
+            <h3>Lender</h3>
+            {/* Remove rinkeby for production version */}
+            <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.lender}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.lender)}</a></h4>
+          </div>
+          <div className="dbDetailSection">
+            <h3>Borrower</h3>
+            <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.borrower}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.borrower)}</a></h4>
+          </div>
+          <div className="dbDetailSection">
+            <h3>Amount</h3>
+            <h4>{utils.formatEther(loan!.amount)} ETH</h4>
+          </div>
+          <div className="dbDetailSection">
+            <h3>Interest</h3>
+            <h4>{Number(utils.formatEther(loan!.interest)) / Number(utils.formatEther(loan!.amount)) * 100}% ({utils.formatEther(loan!.interest)} ETH)</h4>
+          </div>
+          <div className="dbDetailSection" style={{ width: '100%' }}>
+            <h3>Deadline</h3>
+            <h4>{formatDeadline(loan!.deadline).toLocaleString()}</h4>
+          </div>
+          <div className="dbDetailSection" style={{ width: '100%', display: 'flex' }}>
+            <h3 style={{ marginRight: '15px' }}>Collateral</h3>
+            <div className="addButton">View</div>
+          </div>
+        </div>
+        <div className="dbManageSection">
+          <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
+          <p>{loan!.lender === account ? 
+            `Confirm the Loan by depositing ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
+            `Confirm the Loan by transferring the Collateral NFT(s) to the Loan Contract.`
+          }</p>
+          <div 
+            className="button submitButton" 
+            style={{ width: '100% ' }}
+            onClick={loan!.lender === account ? confirmLender : confirmBorrower}
+          >Confirm Loan</div>
         </div>
       </div>
-      <div className="dbDetailsContainer">
-        <div className="dbDetailSection">
-          <h3>Lender</h3>
-          {/* Remove rinkeby for production version */}
-          <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.lender}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.lender)}</a></h4>
-        </div>
-        <div className="dbDetailSection">
-          <h3>Borrower</h3>
-          <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.borrower}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.borrower)}</a></h4>
-        </div>
-        <div className="dbDetailSection">
-          <h3>Amount</h3>
-          <h4>{utils.formatEther(loan!.amount)} ETH</h4>
-        </div>
-        <div className="dbDetailSection">
-          <h3>Interest</h3>
-          <h4>{Number(utils.formatEther(loan!.interest)) / Number(utils.formatEther(loan!.amount)) * 100}% ({utils.formatEther(loan!.interest)} ETH)</h4>
-        </div>
-        <div className="dbDetailSection" style={{ width: '100%' }}>
-          <h3>Deadline</h3>
-          <h4>{formatDeadline(loan!.deadline).toLocaleString()}</h4>
-        </div>
-      </div>
+
     </div> }
   </div>
 }
