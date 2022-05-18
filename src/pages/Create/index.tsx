@@ -111,7 +111,6 @@ export default function Create() {
         <h1>Create Loan</h1>
         <div className="button submitButton"
           onClick={active ? submitLoan : connectWallet}
-          style={{ width: '100%' }}
         >{active ? 'Submit Loan' : 'Connect Wallet'}</div>
       </div>
 

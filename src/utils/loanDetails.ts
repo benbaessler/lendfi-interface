@@ -20,3 +20,10 @@ export const getStatusDetails = (data: Loan) => {
 export const formatDeadline = (unixTimestamp: number) => {
   return new Date(unixTimestamp * 1000)
 }
+
+export const getConfirmations = (data: Loan) => {
+  let confirmations: number = 0
+  if (data.lenderConfirmed) confirmations++
+  if (data.borrowerConfirmed) confirmations++
+  return confirmations
+}

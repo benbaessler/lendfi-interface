@@ -30,7 +30,7 @@ p {
 .submitButton {
   color: white;
   background-color: #330d94;
-  width: 210px !important;
+  width: 210px;
   transition: .2s;
 }
 
