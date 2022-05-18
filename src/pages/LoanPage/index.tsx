@@ -4,7 +4,10 @@ import { RouteComponentProps, useParams, Redirect } from "react-router-dom"
 import getContract from '../../utils/getContract'
 import { useWeb3React } from '@web3-react/core'
 import { Loan } from '../../types/loan'
-import { getStatusDetails } from '../../utils/loanDetails'
+import { formatDeadline, getStatusDetails } from '../../utils/loanDetails'
+import { Spinner } from 'react-bootstrap'
+import { shortenAddress } from '../../utils'
+import { utils } from 'ethers'
 
 interface RouteParams {
   id: string
@@ -15,6 +18,8 @@ interface UserProfile extends RouteComponentProps<RouteParams> {}
 export const LoanPage: React.FC<RouteParams> = (props) => {
   const params = useParams<RouteParams>()
   const loanId = params.id
+
+  const [loading, setLoading] = useState<boolean>(true)
 
   const { active, library } = useWeb3React()
   const [loan, setLoan] = useState<Loan>()
@@ -29,6 +34,8 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
+
+    setLoading(false)
   }
 
   useEffect(() => { if (active) init() }, [active])
@@ -36,15 +43,40 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // ! : Add Redirect for non-existing Loan ID.
 
   return <div className="interfaceContainer dashboardWrapper">
-    <div className="dbTitleContainer">
-      <h1 id="dbTitle">Manage Loan</h1>
-      <div className="statusContainer">
-        <div id="statusIndicator" style={{ backgroundColor: statusDetails ? statusDetails[1] : 'rgba(256, 256, 256, .5)' }}/>
-        <span 
-          id="statusTitle"
-          style={{ opacity: statusDetails ? 1 : .5 }}
-        >{statusDetails ? statusDetails[0] : 'Loading...'}</span>
+    {loading ? <Spinner animation="border" variant="light" style={{
+      position: 'absolute',
+      right: '50%',
+      bottom: '50%',
+    }}/> : <div>
+      <div className="dbTitleContainer">
+        <h1 id="dbTitle">Manage Loan</h1>
+        <div className="statusContainer">
+          <div id="statusIndicator" style={{ backgroundColor: statusDetails![1] }}/>
+          <span id="statusTitle">{statusDetails![0]}</span>
+        </div>
       </div>
-    </div>
+      <div className="dbDetailsContainer">
+        <div className="dbDetailSection">
+          <h3>Lender</h3>
+          <h4>{shortenAddress(loan!.lender)}</h4>
+        </div>
+        <div className="dbDetailSection">
+          <h3>Borrower</h3>
+          <h4>{shortenAddress(loan!.borrower)}</h4>
+        </div>
+        <div className="dbDetailSection">
+          <h3>Amount</h3>
+          <h4>{utils.formatEther(loan!.amount)} ETH</h4>
+        </div>
+        <div className="dbDetailSection">
+          <h3>Interest</h3>
+          <h4>{Number(utils.formatEther(loan!.interest)) / Number(utils.formatEther(loan!.amount)) * 100}% ({utils.formatEther(loan!.interest)} ETH)</h4>
+        </div>
+        <div className="dbDetailSection" style={{ width: '100%' }}>
+          <h3>Deadline</h3>
+          <h4>{formatDeadline(loan!.deadline).toLocaleString()}</h4>
+        </div>
+      </div>
+    </div> }
   </div>
 }

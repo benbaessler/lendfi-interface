@@ -2,6 +2,22 @@
   min-height: 400px;
 }
 
+.dashboardWrapper h3 {
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  margin-bottom: 5px !important;
+}
+
+.dashboardWrapper h4 {
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  opacity: .8;
+}
+
+.dbTitleContainer {
+  margin-bottom: 30px;
+}
+
 #dbTitle {
   margin-bottom: 5px;
 }
@@ -17,4 +33,17 @@
   border-radius: 50%;
   background-color: white;
   margin-right: 10px;
+}
+
+.dbDetailsContainer {
+  width: 60%;
+  display: flex;
+  flex-wrap: wrap;
+  padding-right: 20px;
+}
+
+.dbDetailSection {
+  width: 150px;
+  margin-right: 50px;
+  margin-bottom: 20px;
 }
