@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../connectors'
 
@@ -42,6 +42,8 @@ export function useEagerConnect() {
  * and out after checking what network theyre on
  */
 export function useInactiveListener(suppress = false) {
+  const [, updateState] = React.useState<any>();
+  const forceUpdate = React.useCallback(() => updateState({}), []);
   const { active, error, activate } = useWeb3React()
 
   useEffect(() => {
@@ -49,6 +51,7 @@ export function useInactiveListener(suppress = false) {
 
     if (ethereum && ethereum.on && !active && !error && !suppress) {
       const handleChainChanged = () => {
+        forceUpdate()
         // eat errors
         activate(injected, undefined, true).catch((error) => {
           console.error('Failed to activate after chain changed', error)
@@ -56,6 +59,7 @@ export function useInactiveListener(suppress = false) {
       }
 
       const handleAccountsChanged = (accounts: string[]) => {
+        forceUpdate()
         if (accounts.length > 0) {
           // eat errors
           activate(injected, undefined, true).catch((error) => {
