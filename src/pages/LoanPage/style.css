@@ -1,0 +1,20 @@
+.dashboardWrapper {
+  min-height: 400px;
+}
+
+#dbTitle {
+  margin-bottom: 5px;
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+}
+
+#statusIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: white;
+  margin-right: 10px;
+}
