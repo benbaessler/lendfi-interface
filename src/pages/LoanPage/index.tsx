@@ -7,7 +7,9 @@ import { Loan } from '../../types/loan'
 import { formatDeadline, getStatusDetails, getConfirmations } from '../../utils/loanDetails'
 import { Spinner } from 'react-bootstrap'
 import { shortenAddress } from '../../utils'
-import { utils } from 'ethers'
+import { utils, Contract } from 'ethers'
+import ERC721ABI from '../../abis/ERC721.json'
+import { factoryAddress } from '../../constants'
 
 interface RouteParams {
   id: string
@@ -27,6 +29,9 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // Loan Details
   const [statusDetails, setStatusDetails] = useState<string[]>()
 
+  // Loan Manager
+  const [confirmBtnText, setConfirmBtnText] = useState<string>('Confirm Loan')
+
   const confirmLender = async () => {
     const factoryContract = getContract(library.getSigner())
     await factoryContract.confirmLender(loanId, { value: loan!.amount })
@@ -34,11 +39,33 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     console.log(`Successfully confirmed Loan by depositing ${utils.formatEther(loan!.amount)} ETH into the Loan Contract!`)
   }
 
-  const confirmBorrower = async () => {
-    const factoryContract = getContract(library.getSigner())
-    await factoryContract.confirmBorrower(loanId)
+  const confirmBorrower = async (_loan: Loan) => {
+    const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
+    const approved = await collateralContract.isApprovedForAll(account, factoryAddress)
 
-    console.log(`Successfully confirmed Loan by transferring 1 NFT to the Loan Contract!`)
+    // Approving NFT for Contract
+    if (!approved) {
+      setConfirmBtnText('Approving...')
+      // ! : Account for tx rejection
+      await collateralContract.setApprovalForAll(factoryAddress, true).then(async () => {
+        setConfirmBtnText('Confirm Loan')
+        const factoryContract = getContract(library.getSigner())
+        setConfirmBtnText('Confirming...')
+        await factoryContract.confirmBorrower(loanId).then(() => {
+          setConfirmBtnText('Confirmed')
+          console.log('Success')
+        })
+      })
+    }
+
+    // Calling Contract function
+    const factoryContract = getContract(library.getSigner())
+    setConfirmBtnText('Confirming...')
+    await factoryContract.confirmBorrower(loanId).then(() => {
+      setConfirmBtnText('Confirmed')
+      console.log('Success')
+    })
+
   }
 
   const init = async () => {
@@ -46,7 +73,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
 
-    // console.log(_loan)
+    // console.log(_loan!.collateral[0])
 
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
@@ -108,9 +135,9 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           }</p>
           <div 
             className="button submitButton" 
-            style={{ width: '100% ' }}
-            onClick={loan!.lender === account ? confirmLender : confirmBorrower}
-          >Confirm Loan</div>
+            style={{ width: '100% ', height: '35px' }}
+            onClick={loan!.lender === account ? confirmLender : () => confirmBorrower(loan!)}
+          >{confirmBtnText}</div>
         </div>
       </div>
 
