@@ -31,6 +31,10 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   // Loan Manager
   const [confirmBtnText, setConfirmBtnText] = useState<string>('Confirm Loan')
+  const [confirmBtnStatus, setConfirmBtnStatus] = useState<boolean>(true)
+
+  const [deadlineInput, setDeadlineInput] = useState<string>('')
+  const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
 
   const confirmLender = async () => {
     const factoryContract = getContract(library.getSigner())
@@ -53,7 +57,6 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
         setConfirmBtnText('Confirming...')
         await factoryContract.confirmBorrower(loanId).then(() => {
           setConfirmBtnText('Confirmed')
-          console.log('Success')
         })
       })
     }
@@ -63,9 +66,16 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     setConfirmBtnText('Confirming...')
     await factoryContract.confirmBorrower(loanId).then(() => {
       setConfirmBtnText('Confirmed')
-      console.log('Success')
     })
+  }
 
+  const extendDeadline = async () => {
+    const factoryContract = getContract(library.getSigner())
+
+    const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
+
+    await factoryContract.extendDeadline(loanId, unixDeadline)
+    console.log('Success! New deadline:', unixDeadline)
   }
 
   const init = async () => {
@@ -73,10 +83,18 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
 
-    // console.log(_loan!.collateral[0])
-
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
+
+    if (_loan.lender === account && _loan.lenderConfirmed) {
+      setConfirmBtnText('Confirmed')
+      setConfirmBtnStatus(false)
+    }
+
+    if (_loan.borrower === account && _loan.borrowerConfirmed) {
+      setConfirmBtnText('Confirmed')
+      setConfirmBtnStatus(false)
+    }
 
     setLoading(false)
   }
@@ -130,14 +148,22 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
         <div className="dbManageSection">
           <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
           <p>{loan!.lender === account ? 
-            `Confirm the Loan by depositing ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
+            `Confirm the Loan by transferring ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
             `Confirm the Loan by transferring the Collateral NFT(s) to the Loan Contract.`
           }</p>
           <div 
-            className="button submitButton" 
-            style={{ width: '100% ', height: '35px' }}
-            onClick={loan!.lender === account ? confirmLender : () => confirmBorrower(loan!)}
+            className="button submitButton dbButton" 
+            id={!confirmBtnStatus ? 'disabled' : ''}
+            onClick={confirmBtnStatus ? loan!.lender === account ? confirmLender : () => confirmBorrower(loan!) : () => {}}
           >{confirmBtnText}</div>
+          <h3>Extend Deadline</h3>
+          <div className="input" style={{ height: '35px', marginBottom: '12px' }}>
+            <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>
+          </div>
+          <div 
+            className="button submitButton dbButton" 
+            onClick={extendDeadline}
+          >Update</div>
         </div>
       </div>
 
