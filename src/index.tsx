@@ -6,6 +6,7 @@ import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from '@ethersproject/providers'
 import { GlobalStore } from './state'
 import { BrowserRouter } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const getLibrary = (provider: any) => {
   return new Web3Provider(provider)

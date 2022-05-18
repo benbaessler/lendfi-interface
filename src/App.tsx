@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom'
 import { useEagerConnect, useInactiveListener } from './hooks'
 import Create from './pages/Create';
 import Loans from './pages/Loans';
-import { Loan } from './pages/Loan';
+import { LoanPage } from './pages/LoanPage';
 import NavigationBar from './components/NavigationBar';
 
 function App() {
@@ -12,12 +12,11 @@ function App() {
   useInactiveListener(!triedEager)
   
   // Add Redirect from /loans to /
-
   return <Switch>
     <div className="App">
       <NavigationBar/>
       <Route path="/" exact component={Loans}/>
-      <Route path="/loan/:id" exact component={Loan}/>
+      <Route path="/loan/:id" exact component={LoanPage}/>
       <Route path="/create" component={Create}/>
     </div>
   </Switch>

@@ -5,6 +5,7 @@ import getContract from '../../utils/getContract'
 import { useEffect, useState } from 'react'
 import { Loan } from '../../types/loan'
 import { shortenAddress } from '../../utils'
+import { getStatusDetails, formatDeadline } from '../../utils/loanDetails';
 
 /*
   Parameters:
@@ -22,18 +23,10 @@ interface LoanComponentProps { data: Loan }
 
 export default function Loans() {
   const { active, account, activate, library } = useWeb3React()
-  let signer: Signer
-
-  useEffect(() => {
-    if (active) {
-      signer = library.getSigner()
-    }
-  }, [active])
-
   const [loans, setLoans] = useState<Loan[]>([])
 
   const getLoans = async () => {
-    const factoryContract = getContract(signer)
+    const factoryContract = getContract(library.getSigner())
     // Change later
     const loans = await factoryContract.getSenderLoans()
     setLoans(loans)
@@ -47,28 +40,12 @@ export default function Loans() {
     return shortAddress
   }
 
-  useEffect(() => {
-    if (active) {
-      getLoans()
-    }
-  }, [active])
+  useEffect(() => { if (active) getLoans() }, [active])
 
   const LoanComponent = ({ data }: LoanComponentProps) => {    
-    const formattedDeadline = new Date(data.deadline * 1000)
+    const formattedDeadline = formatDeadline(data.deadline)
     const [userDisplay, setUserDisplay] = useState<string>()
-
-    let status: string
-    let statusColor: string
-    if (data.active) {
-      status = 'Active'
-      statusColor = '#14c443'
-    } else if (data.executed) {
-      status = 'Executed'
-      statusColor = '#ff0000'
-    } else {
-      status = 'Initialized'
-      statusColor = 'white'
-    }
+    const [status, statusColor] = getStatusDetails(data)
 
     const _setUserDisplay = async () => {
       let param: string

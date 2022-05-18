@@ -1,6 +1,6 @@
 import './style.css'
 import { useState, useEffect, useContext } from 'react';
-import { utils, BigNumber, Signer, providers, Contract } from 'ethers';
+import { utils, BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
@@ -8,8 +8,6 @@ import getTokens from '../../utils/getTokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
 import { CollateralContext } from '../../state/collateral'
 import getContract from '../../utils/getContract';
-import { factoryAddress } from '../../constants';
-import LoanFactoryABI from '../../artifacts/contracts/LoanFactory.sol/LoanFactory.json'
 
 export default function Create() {
   const { active, account, activate, library } = useWeb3React()
@@ -58,7 +56,7 @@ export default function Create() {
   }
 
   const submitLoan = async () => {
-    const factoryContract = new Contract(factoryAddress, LoanFactoryABI.abi, library.getSigner())
+    const factoryContract = getContract(library.getSigner())
     // Parsing input data
     const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
     const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
@@ -107,7 +105,7 @@ export default function Create() {
       onClose={() => setShowModal(false)}
     /> : <div/>}
 
-    <div className="interfaceContainer">
+    <div className="interfaceContainer createWrapper">
 
       <div className="createTopContainer">
         <h1>Create Loan</h1>

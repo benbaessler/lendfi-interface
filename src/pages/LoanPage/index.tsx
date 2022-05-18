@@ -58,11 +58,12 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       <div className="dbDetailsContainer">
         <div className="dbDetailSection">
           <h3>Lender</h3>
-          <h4>{shortenAddress(loan!.lender)}</h4>
+          {/* Remove rinkeby for production version */}
+          <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.lender}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.lender)}</a></h4>
         </div>
         <div className="dbDetailSection">
           <h3>Borrower</h3>
-          <h4>{shortenAddress(loan!.borrower)}</h4>
+          <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.borrower}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.borrower)}</a></h4>
         </div>
         <div className="dbDetailSection">
           <h3>Amount</h3>
