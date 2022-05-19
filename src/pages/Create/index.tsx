@@ -17,7 +17,8 @@ export default function Create() {
 
   const [lender, setLender] = useState<string>()
   const [borrower, setBorrower] = useState<string>()
-  const [borrowerTokens, setBorrowerTokens] = useState<AlchemyAPIToken[]>([])
+  const [borrowerTokens, setBorrowerTokens] = useState<AlchemyAPIToken[] | boolean>(false)
+  const [modalLoading, setModalLoading] = useState<boolean>(true)
 
   // Input
   const [amountInput, setAmountInput] = useState<string>()
@@ -82,8 +83,11 @@ export default function Create() {
 
   useEffect(() => {
     if (borrower) {
+      setModalLoading(true)
       getTokens(borrower).then((tokens: AlchemyAPIToken[]) => {
         setBorrowerTokens(tokens)
+        setModalLoading(false)
+        console.log(borrowerTokens)
       })
     } else setBorrowerTokens([])
   }, [borrower])
@@ -99,11 +103,12 @@ export default function Create() {
   }
 
   return <>
-    {borrowerTokens.length > 0 ? <TokenModal 
+    <TokenModal 
       data={borrowerTokens}
       show={showModal} 
       onClose={() => setShowModal(false)}
-    /> : <div/>}
+      loading={modalLoading}
+    />
 
     <div className="interfaceContainer createWrapper">
 

@@ -45,32 +45,29 @@
 }
 
 .collateralViewBtn {
+  z-index: 10;
   color: #1c92ff;
   cursor: pointer;
   opacity: 1 !important;
 }
 
 #c-1 {
-  width: 8%;
+  width: 10%;
 }
 
 #c-2 {
-  width: 17%;
+  width: 20%;
 }
 
 #c-3 {
-  width: 14%;
+  width: 15%;
 }
 
 #c-4 {
-  width: 17%;
+  width: 18%;
 }
 
 #c-5 {
-  width: 12%;
-}
-
-#c-6 {
   width: 25%;
 }
 

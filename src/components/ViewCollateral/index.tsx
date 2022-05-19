@@ -3,8 +3,9 @@ import { ModalProps } from '../../types/modal';
 import Close from '../../assets/icons/close.png'
 import { TokenCardProps } from '../../types'
 import { getOpenSeaLink } from '../../utils/tokens'
+import { Spinner } from 'react-bootstrap';
 
-export default function CollateralPopup({ data, show, onClose }: ModalProps) {
+export default function CollateralPopup({ data, show, onClose, loading }: ModalProps) {
 
   const TokenCard = ({ data }: TokenCardProps) => {
     return <div className="tokenContainer">
@@ -27,9 +28,13 @@ export default function CollateralPopup({ data, show, onClose }: ModalProps) {
         <img src={Close} id="closeIcon" onClick={onClose}/>
       </div>
 
-      <div className="modalContent">
+      {loading ? <Spinner animation="border" variant="light" style={{
+        position: 'absolute',
+        right: '45%',
+        bottom: '40%',
+      }}/> : <div className="modalContent">
         <TokenCard data={data}/>
-      </div>
+      </div>}
     </div>
   </div>
 }

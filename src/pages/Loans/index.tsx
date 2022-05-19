@@ -7,6 +7,10 @@ import { Loan } from '../../types/loan'
 import { shortenAddress } from '../../utils'
 import { getStatusDetails, formatDeadline } from '../../utils/loanDetails';
 import { useHistory } from "react-router-dom";
+import CollateralPopup from '../../components/ViewCollateral';
+import { getToken } from '../../utils/tokens';
+import { Invite } from 'discord.js';
+import { createImportSpecifier } from 'typescript';
 
 /*
   Parameters:
@@ -48,19 +52,21 @@ export default function Loans() {
     const formattedDeadline = formatDeadline(data.deadline)
     const [userDisplay, setUserDisplay] = useState<string>()
     const [status, statusColor] = getStatusDetails(data)
+    const [showCollateral, setShowCollateral] = useState<boolean>(false)
+    const [metadata, setMetadata] = useState()
+    const [collatLoading, setCollatLoading] = useState<boolean>(true)
 
-    const _setUserDisplay = async () => {
-      let param: string
-      if (account === data.lender) param = data.borrower
-      else param = data.lender
-
-      const response = await formatUser(param)
-      setUserDisplay(response)
-      console.log(response, userDisplay)
+    const init = async () => {
+      const _metadata = await getToken(data.collateral[0], Number(data.collateral[1]))
+      setMetadata(_metadata)
+      setCollatLoading(false)
     }
+
+    useEffect(() => { init() }, [])
 
     return (
       <>
+        <CollateralPopup data={metadata} show={showCollateral} onClose={() => setShowCollateral(false)} loading={collatLoading}/>
         <div className="loanContainer" onClick={() => history.replace(`loan/${data.id}`)}>
           <div className="loanContentContainer">
             <div id="loansStatusInd" style={{ backgroundColor: statusColor }}/>
@@ -68,8 +74,7 @@ export default function Loans() {
             <span id="c-2">{account === data.lender ? shortenAddress(data.borrower, 3) : shortenAddress(data.lender, 3)}</span>
             <span id="c-3">{utils.formatEther(data.amount)} ETH</span>
             <span id="c-4">{utils.formatEther(data.interest)} ETH</span>
-            <span id="c-5" className="collateralViewBtn">View</span>
-            <span id="c-6">{formattedDeadline.toLocaleString()}</span>
+            <span id="c-5">{formattedDeadline.toLocaleString()}</span>
           </div>
         </div>
       </>
@@ -84,8 +89,7 @@ export default function Loans() {
       <span id="c-2">User</span>
       <span id="c-3">Amount</span>
       <span id="c-4">Interest</span>
-      <span id="c-5">Collateral</span>
-      <span id="c-6">Deadline</span>
+      <span id="c-5">Deadline</span>
     </div>
     {loans.map((loan: Loan) => <LoanComponent data={loan}/>)}
   </div>
