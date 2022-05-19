@@ -91,6 +91,6 @@ export default function Loans() {
       <span id="c-4">Interest</span>
       <span id="c-5">Deadline</span>
     </div>
-    {loans.map((loan: Loan) => <LoanComponent data={loan}/>)}
+    {loans.slice(0).reverse().map((loan: Loan) => <LoanComponent data={loan}/>)}
   </div>
 }

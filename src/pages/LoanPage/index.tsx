@@ -69,7 +69,8 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   }
 
   const claimCollateral = async () => {
-
+    const factoryContract = getContract(library.getSigner())
+    await factoryContract.claimCollateral(loanId)
   }
 
   const extendDeadline = async () => {
@@ -204,29 +205,30 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
             </div>
             <div 
               className="button submitButton dbButton" 
+              id={loan!.executed ? 'disabled': ''}
               onClick={extendDeadline}
-          >Update</div>
-          </div> : <div className={!loan!.active || loan!.executed ? 'disabledSection': ''}>
-            <h3>Pay Loan</h3>
-            <p>You will receive your Collateral NFT as soon as the Loan is paid.</p>
-            <div 
-              className="button submitButton dbButton" 
-              id={loan!.executed ? 'disabled' : ''}
-              onClick={loan!.active ? paybackLoan : () => {}}
-            >{loan!.loanPaid ? 'Paid' : 'Transfer'}</div>
-          </div>}
-          {loan!.lender === account ? <div className={!loan!.active || loan!.executed ? 'disabledSection' : ''}>
-            <h3>Claim Collateral</h3>
-            <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
-            <div 
-              className="button submitButton dbButton" 
-              id={loan!.collateralClaimed ? 'disabled' : ''}
-              onClick={claimActive ? claimCollateral : () => {}}
-            >Claim</div>
-          </div> : <div/>}
+            >Update</div>
+            </div> : <div className={!loan!.active || loan!.executed ? 'disabledSection': ''}>
+              <h3>Pay Loan</h3>
+              <p>You will receive your Collateral NFT as soon as the Loan is paid.</p>
+              <div 
+                className="button submitButton dbButton" 
+                id={loan!.executed ? 'disabled' : ''}
+                onClick={loan!.active ? paybackLoan : () => {}}
+              >{loan!.loanPaid ? 'Paid' : 'Transfer'}</div>
+            </div>}
+            {loan!.lender === account ? <div className={!loan!.active || loan!.executed ? 'disabledSection' : ''}>
+              <h3>Claim Collateral</h3>
+              <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
+              <div 
+                className="button submitButton dbButton" 
+                id={loan!.collateralClaimed || loan!.executed ? 'disabled' : ''}
+                onClick={claimActive ? claimCollateral : () => {}}
+              >{loan!.collateralClaimed ? 'Claimed' : 'Claim'}</div>
+            </div> : <div/>}
+          </div>
         </div>
-      </div>
-    </div>}
-  </div>
+      </div>}
+    </div>
   </>
 }

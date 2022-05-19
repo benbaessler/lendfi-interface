@@ -87,7 +87,6 @@ export default function Create() {
       getTokens(borrower).then((tokens: AlchemyAPIToken[]) => {
         setBorrowerTokens(tokens)
         setModalLoading(false)
-        console.log(borrowerTokens)
       })
     } else setBorrowerTokens([])
   }, [borrower])
