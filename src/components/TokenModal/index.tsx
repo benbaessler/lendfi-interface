@@ -7,8 +7,9 @@ import Checkmark from '../../assets/icons/checkmark.png'
 import { ModalProps } from '../../types/modal';
 import { networkName, openseaBaseUrl } from '../../constants';
 import { getOpenSeaLink } from '../../utils/tokens';
+import { Spinner } from 'react-bootstrap';
 
-export default function TokenModal({ data, show, onClose }: ModalProps) {
+export default function TokenModal({ data, show, onClose, loading }: ModalProps) {
   const [collateral, setCollateral] = useContext(CollateralContext)
 
   const TokenCard = ({ data }: TokenCardProps) => {
@@ -57,9 +58,13 @@ export default function TokenModal({ data, show, onClose }: ModalProps) {
         <img src={Close} id="closeIcon" onClick={onClose}/>
       </div>
 
-      <div className="modalContent">
+      {loading ? <Spinner animation="border" variant="light" style={{
+        position: 'absolute',
+        right: '45%',
+        bottom: '40%',
+      }}/> : <div className="modalContent">
         {data.map((token: AlchemyAPIToken) => <TokenCard data={token}/>)}
-      </div>
+      </div>}
     </div>
   </div>
 }
