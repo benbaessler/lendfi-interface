@@ -168,10 +168,7 @@ export default function Create() {
 
           <div className="collateralContainer" id={borrower ? 'shown' : 'hidden'}>
             <div className="collateralTopSection">
-              <div className="collateralTitle">
-                <h3 style={{ margin: 0 }}>Collateral</h3>
-                <h4>{`(${collateral.length})`}</h4> 
-              </div>
+              <h3 style={{ margin: 0 }}>Collateral</h3>
               <div className="valueAddCollateral">
                 <div 
                   className="addButton" 
