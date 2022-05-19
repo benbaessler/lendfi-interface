@@ -5,9 +5,10 @@ import { CollateralContext } from '../../state/collateral';
 import Close from '../../assets/icons/close.png'
 import Checkmark from '../../assets/icons/checkmark.png'
 import { ModalProps } from '../../types/modal';
+import { networkName, openseaBaseUrl } from '../../constants';
+import { getOpenSeaLink } from '../../utils/tokens';
 
 export default function TokenModal({ data, show, onClose }: ModalProps) {
-
   const [collateral, setCollateral] = useContext(CollateralContext)
 
   const TokenCard = ({ data }: TokenCardProps) => {
@@ -40,8 +41,11 @@ export default function TokenModal({ data, show, onClose }: ModalProps) {
       <img id="selectedIcon" src={Checkmark} style={{ display: selected ? '' : 'none'}}/>
       <img id="tokenImage" src={data.media[0].gateway} style={{ opacity: selected ? 1 : .8 }}/>
       <div className="tokenInfo">
-        <p>{data.title}</p>
-        {/* <p id="floorPrice">{data.floor} ETH</p> */}
+        <p><a 
+          href={getOpenSeaLink(data)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >{data.title}</a></p>
       </div>
     </div>
   }

@@ -11,7 +11,8 @@ import { utils, Contract, BigNumber } from 'ethers'
 import ERC721ABI from '../../abis/ERC721.json'
 import { etherscanBaseUrl, factoryAddress } from '../../constants'
 import CollateralPopup from '../../components/ViewCollateral';
-import { getToken } from '../../utils/getTokens'
+import { getToken } from '../../utils/tokens'
+import { AlchemyAPIToken } from '../../types'
 
 interface RouteParams {
   id: string
@@ -31,7 +32,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // Loan Details
   const [statusDetails, setStatusDetails] = useState<string[]>()
 
-  const [collateralData, setCollateralData] = useState()
+  const [collateralData, setCollateralData] = useState<AlchemyAPIToken>()
   const [showCollateral, setShowCollateral] = useState<boolean>(false)
 
   // Loan Manager

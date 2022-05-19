@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { networkName, openseaBaseUrl } from '../constants'
+import { AlchemyAPIToken } from '../types'
 
 const baseUrl = `https://eth-rinkeby.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_API_KEY}/`
 
@@ -10,4 +12,10 @@ export const getTokens = async (address: string) => {
 export const getToken = async (address: string, tokenId: number) => {
   const response = await axios.get(baseUrl + `getNFTMetadata?contractAddress=${address}&tokenId=${tokenId}&tokenType=erc721`)
   return response.data
+}
+
+export const getOpenSeaLink = (data: AlchemyAPIToken) => {
+  const _tokenId = data.id.tokenId === "0x0000000000000000000000000000000000000000000000000000000000000000" ? '0' : data.id.tokenId
+  const result = openseaBaseUrl + `assets/${networkName}/${data.contract.address}/${_tokenId}`
+  return result
 }

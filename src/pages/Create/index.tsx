@@ -4,7 +4,7 @@ import { utils, BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
-import { getTokens } from '../../utils/getTokens'
+import { getTokens } from '../../utils/tokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
 import { CollateralContext } from '../../state/collateral'
 import getContract from '../../utils/getContract';

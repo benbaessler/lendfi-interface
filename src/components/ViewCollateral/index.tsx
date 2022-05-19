@@ -1,8 +1,8 @@
 import './style.css'
 import { ModalProps } from '../../types/modal';
 import Close from '../../assets/icons/close.png'
-import { AlchemyAPIToken, TokenCardProps } from '../../types'
-import { networkName, openseaBaseUrl } from '../../constants';
+import { TokenCardProps } from '../../types'
+import { getOpenSeaLink } from '../../utils/tokens'
 
 export default function CollateralPopup({ data, show, onClose }: ModalProps) {
 
@@ -11,7 +11,7 @@ export default function CollateralPopup({ data, show, onClose }: ModalProps) {
       <img id="tokenImage" src={data.media[0].gateway}/>
       <div className="tokenInfo">
         <p><a 
-          href={openseaBaseUrl + `assets/${networkName}/${data.contract.address}/${data.id.tokenId}`}
+          href={getOpenSeaLink(data)}
           target="_blank"
           rel="noopener noreferrer"
         >{data.title}</a></p>
