@@ -1,6 +1,5 @@
 .tokenModalContainer {
   max-height: 700px;
-  height: 80%;
   max-width: 820px;
   background-color: #18191F;
   border-radius: 10px;
@@ -75,6 +74,18 @@
   height: 50px;
   align-items: center;
   justify-content: space-between;
+}
+
+.tokenInfo a {
+  text-decoration: none;
+  color: white;
+  opacity: .8;
+  transition: .2s;
+  cursor: pointer;
+}
+
+.tokenInfo a:hover {
+  opacity: 1;
 }
 
 #floorPrice {

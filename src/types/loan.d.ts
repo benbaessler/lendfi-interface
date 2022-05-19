@@ -1,6 +1,7 @@
 import { BigNumber } from "ethers"
 
 export interface Loan {
+  id: number
   lender: string
   borrower: string
   amount: number
@@ -11,4 +12,6 @@ export interface Loan {
   borrowerConfirmed: boolean
   active: boolean
   executed: boolean
+  loanPaid: boolean
+  collateralClaimed: boolean
 }

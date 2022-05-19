@@ -15,9 +15,9 @@ function App() {
   return <Switch>
     <div className="App">
       <NavigationBar/>
-      <Route path="/" exact component={Loans}/>
+      <Route path="/loans" exact component={Loans}/>
       <Route path="/loan/:id" exact component={LoanPage}/>
-      <Route path="/create" component={Create}/>
+      <Route path="/create" exact component={Create}/>
     </div>
   </Switch>
 }

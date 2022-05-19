@@ -9,7 +9,9 @@ import { Spinner } from 'react-bootstrap'
 import { shortenAddress } from '../../utils'
 import { utils, Contract, BigNumber } from 'ethers'
 import ERC721ABI from '../../abis/ERC721.json'
-import { factoryAddress } from '../../constants'
+import { etherscanBaseUrl, factoryAddress } from '../../constants'
+import CollateralPopup from '../../components/ViewCollateral';
+import { getToken } from '../../utils/getTokens'
 
 interface RouteParams {
   id: string
@@ -29,6 +31,9 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // Loan Details
   const [statusDetails, setStatusDetails] = useState<string[]>()
 
+  const [collateralData, setCollateralData] = useState()
+  const [showCollateral, setShowCollateral] = useState<boolean>(false)
+
   // Loan Manager
   const [confirmed, setConfirmed] = useState<boolean>(false)
   const [loanActive, setLoanActive] = useState<boolean>(false)
@@ -43,7 +48,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   const confirmLender = async () => {
     const factoryContract = getContract(library.getSigner())
-    await factoryContract.confirmLender(loanId, { value: loan!.amount })
+    await factoryContract.confirmLender(loanId, { value: BigNumber.from(loan!.amount).add(loan!.amount / 100)})
 
     console.log(`Successfully confirmed Loan by depositing ${utils.formatEther(loan!.amount)} ETH into the Loan Contract!`)
   }
@@ -92,15 +97,18 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   }
 
   const init = async () => {
+    // Getting Loan data
     const factoryContract = getContract(library.getSigner())
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
 
     const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
 
+    // Getting Loan status
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
 
+    // Updating UI status
     if (_loan.lender === account && _loan.lenderConfirmed) setConfirmed(true)
     else if (_loan.borrower === account && _loan.borrowerConfirmed) setConfirmed(true)
     if (_loan.borrower === account && !_loan.borrowerConfirmed) {
@@ -108,10 +116,12 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       setTokensApproved(approved)
       console.log(approved)
     }
-
     if (_loan.active) setLoanActive(true)
-
     if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && !_loan.executed) setClaimActive(true)
+
+    // Getting Collateral NFT metadata
+    const tokenMetadata = await getToken(_loan.collateral[0], _loan.collateral[1])
+    setCollateralData(tokenMetadata)
 
     setLoading(false)
   }
@@ -120,12 +130,15 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   // ! : Add Redirect for non-existing Loan ID.
 
-  return <div className="interfaceContainer dashboardWrapper">
+  return <>
+    <div className="interfaceContainer dashboardWrapper">
     {loading ? <Spinner animation="border" variant="light" style={{
       position: 'absolute',
       right: '50%',
       bottom: '50%',
     }}/> : <div className="dashboardContainer">
+
+      <CollateralPopup data={collateralData} show={showCollateral} onClose={() => setShowCollateral(false)}/>
       
       <div className="topContainer">
         <h1 id="dbTitle">Manage Loan</h1>
@@ -140,11 +153,11 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           <div className="dbDetailSection">
             <h3>Lender</h3>
             {/* Remove rinkeby for production version */}
-            <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.lender}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.lender)}</a></h4>
+            <h4><a href={etherscanBaseUrl + `address/${loan!.lender}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.lender)}</a></h4>
           </div>
           <div className="dbDetailSection">
             <h3>Borrower</h3>
-            <h4><a href={`https://rinkeby.etherscan.io/address/${loan!.borrower}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.borrower)}</a></h4>
+            <h4><a href={etherscanBaseUrl + `address/${loan!.borrower}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.borrower)}</a></h4>
           </div>
           <div className="dbDetailSection">
             <h3>Amount</h3>
@@ -160,7 +173,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           </div>
           <div className="dbDetailSection" style={{ width: '100%', display: 'flex' }}>
             <h3 style={{ marginRight: '15px' }}>Collateral</h3>
-            <div className="addButton">View</div>
+            <div className="addButton" onClick={() => setShowCollateral(true)}>View</div>
           </div>
         </div>
         <div className="dbManageSection">
@@ -208,7 +221,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           </div> : <div/>}
         </div>
       </div>
-
-    </div> }
+    </div>}
   </div>
+  </>
 }

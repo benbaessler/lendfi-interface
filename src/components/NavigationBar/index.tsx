@@ -15,11 +15,11 @@ export default function NavigationBar() {
   }
 
   return <div className="navigationBarContainer">
-    <img src={Logo} onClick={() => history.push('')} id="logo"/>
+    <img src={Logo} onClick={() => history.replace('')} id="logo"/>
 
     <div>
-      <span style={{ marginRight: '18px' }} onClick={() => history.push('')}>Loans</span>
-      <span onClick={() => history.push('create')}>Create</span>
+      <span style={{ marginRight: '18px' }} onClick={() => history.push('/loans')}>Loans</span>
+      <span onClick={() => history.replace('/create')}>Create</span>
     </div>
 
     <div className="walletSection">

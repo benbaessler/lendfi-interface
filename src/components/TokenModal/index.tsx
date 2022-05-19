@@ -49,7 +49,7 @@ export default function TokenModal({ data, show, onClose }: ModalProps) {
   return <div className="modal" style={{ display: show ? 'flex' : 'none' }}>
     <div className="tokenModalContainer">
       <div className="modalHeader">
-        <h2>Select Tokens</h2>
+        <h4>Select Tokens</h4>
         <img src={Close} id="closeIcon" onClick={onClose}/>
       </div>
 
