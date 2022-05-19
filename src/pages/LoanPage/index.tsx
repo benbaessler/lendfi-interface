@@ -93,7 +93,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   const paybackLoan = async () => {
     const factoryContract = getContract(library.getSigner())
-    const tx = await factoryContract.paybackLoan(loanId, { value: BigNumber.from(loan!.amount).add(loan!.interest) })
+    const tx = await factoryContract.paybackLoan(loanId, { value: BigNumber.from(loan!.amount).add(loan!.interest).add(loan!.amount / 200) })
     console.log(`Successfully paid back loan (${tx.hash})`)
   }
 
@@ -172,9 +172,13 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
             <h3>Deadline</h3>
             <h4>{formatDeadline(loan!.deadline).toLocaleString()}</h4>
           </div>
-          <div className="dbDetailSection" style={{ width: '100%', display: 'flex' }}>
-            <h3 style={{ marginRight: '15px' }}>Collateral</h3>
-            <div className="addButton" onClick={() => setShowCollateral(true)}>View</div>
+          <div className="dbDetailSection" id="collatDetailSection">
+            <h3>Collateral</h3>
+            <div 
+              className="addButton" 
+              onClick={() => setShowCollateral(true)}
+              style={{ width: '40%' }}
+            >View</div>
           </div>
         </div>
         <div className="dbManageSection">
@@ -209,7 +213,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
               className="button submitButton dbButton" 
               id={loan!.executed ? 'disabled' : ''}
               onClick={loan!.active ? paybackLoan : () => {}}
-            >Transfer {utils.formatEther(BigNumber.from(loan!.amount).add(loan!.interest))} ETH</div>
+            >{loan!.loanPaid ? 'Paid' : 'Transfer'}</div>
           </div>}
           {loan!.lender === account ? <div className={!loan!.active || loan!.executed ? 'disabledSection' : ''}>
             <h3>Claim Collateral</h3>
