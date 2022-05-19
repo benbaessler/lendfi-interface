@@ -33,6 +33,9 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   const [confirmed, setConfirmed] = useState<boolean>(false)
   const [loanActive, setLoanActive] = useState<boolean>(false)
 
+  const [tokensApproved, setTokensApproved] = useState<boolean>(true)
+
+  const [deadlineError, setDeadlineError] = useState<boolean>(false)
   const [claimActive, setClaimActive] = useState<boolean>(false)
 
   const [deadlineInput, setDeadlineInput] = useState<string>('')
@@ -46,25 +49,17 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   }
 
   const confirmBorrower = async (_loan: Loan) => {
-    const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
-    const approved = await collateralContract.isApprovedForAll(account, factoryAddress)
-
     // Approving NFT for Contract
-    if (!approved) {
-      // ! : Account for tx rejection
-      await collateralContract.setApprovalForAll(factoryAddress, true).then(async () => {
-        const factoryContract = getContract(library.getSigner())
-        await factoryContract.confirmBorrower(loanId).then(() => {
-          setConfirmed(true)
-        })
+    if (!tokensApproved) {
+      const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
+      await collateralContract.setApprovalForAll(factoryAddress, true)
+    } else {
+      // Calling Contract function
+      const factoryContract = getContract(library.getSigner())
+      await factoryContract.confirmBorrower(loanId).then(() => {
+        setConfirmed(true)
       })
     }
-
-    // Calling Contract function
-    const factoryContract = getContract(library.getSigner())
-    await factoryContract.confirmBorrower(loanId).then(() => {
-      setConfirmed(true)
-    })
   }
 
   const claimCollateral = async () => {
@@ -76,7 +71,17 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
     const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
 
-    await factoryContract.extendDeadline(loanId, unixDeadline)
+    try {
+      await factoryContract.extendDeadline(loanId, unixDeadline)
+    } catch (error: any) {
+      // In case the user inputs a new deadline which is before the old one
+      if (error.message.split('[')[0] === 'cannot estimate gas; transaction may fail or may require manual gas limit ') {
+        setDeadlineError(true)
+      }
+      return
+    } 
+
+    setDeadlineError(false)
     console.log('Success! New deadline:', unixDeadline)
   }
 
@@ -91,11 +96,19 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
 
+    const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
+
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
 
     if (_loan.lender === account && _loan.lenderConfirmed) setConfirmed(true)
-    if (_loan.borrower === account && _loan.borrowerConfirmed) setConfirmed(true)
+    else if (_loan.borrower === account && _loan.borrowerConfirmed) setConfirmed(true)
+    if (_loan.borrower === account && !_loan.borrowerConfirmed) {
+      const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
+      setTokensApproved(approved)
+      console.log(approved)
+    }
+
     if (_loan.active) setLoanActive(true)
 
     if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && !_loan.executed) setClaimActive(true)
@@ -161,29 +174,13 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
               className="button submitButton dbButton" 
               id={confirmed ? 'disabled' : ''}
               onClick={!confirmed ? loan!.lender === account ? confirmLender : () => confirmBorrower(loan!) : () => {}}
-            >{confirmed ? 'Confirmed' : 'Confirm'}</div>
+            >{loan!.borrower === account && !tokensApproved ? 'Approve' : confirmed ? 'Confirmed' : 'Confirm'}</div>
           </div>
-
-          {loan!.lender === account ? <div className={!loan!.active || loan!.executed ? 'disabledSection' : ''}>
-            <h3>Claim Collateral</h3>
-            <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
-            <div 
-              className="button submitButton dbButton" 
-              id={!claimActive ? 'disabled' : ''}
-              onClick={claimActive ? claimCollateral : () => {}}
-            >Claim</div>
-          </div> : <div className={!loan!.active || loan!.executed ? 'disabledSection': ''}>
-            <h3>Pay Loan</h3>
-            <p>You will receive your Collateral NFT as soon as the Loan is paid.</p>
-            <div 
-              className="button submitButton dbButton" 
-              id={!loan!.active ? 'disabled' : ''}
-              onClick={loan!.active ? paybackLoan : () => {}}
-            >Transfer {utils.formatEther(BigNumber.from(loan!.amount).add(loan!.interest))} ETH</div>
-          </div>}
-          
-          <div className={loan!.executed ? 'disabledSection' : ''}>
-            <h3>Extend Deadline</h3>
+          {loan!.lender === account ? <div className={loan!.executed ? 'disabledSection' : ''}>
+            <div className="extendDeadlineTitleWrapper">
+              <h3>Extend Deadline</h3>
+              <p style={{ display: deadlineError ? '' : 'none'}}>You can not shorten the deadline</p>
+            </div>
             <div className="input" style={{ height: '35px', marginBottom: '12px' }}>
               <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>
             </div>
@@ -191,8 +188,24 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
               className="button submitButton dbButton" 
               onClick={extendDeadline}
           >Update</div>
-          </div>
-
+          </div> : <div className={!loan!.active || loan!.executed ? 'disabledSection': ''}>
+            <h3>Pay Loan</h3>
+            <p>You will receive your Collateral NFT as soon as the Loan is paid.</p>
+            <div 
+              className="button submitButton dbButton" 
+              id={loan!.executed ? 'disabled' : ''}
+              onClick={loan!.active ? paybackLoan : () => {}}
+            >Transfer {utils.formatEther(BigNumber.from(loan!.amount).add(loan!.interest))} ETH</div>
+          </div>}
+          {loan!.lender === account ? <div className={!loan!.active || loan!.executed ? 'disabledSection' : ''}>
+            <h3>Claim Collateral</h3>
+            <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
+            <div 
+              className="button submitButton dbButton" 
+              id={loan!.collateralClaimed ? 'disabled' : ''}
+              onClick={claimActive ? claimCollateral : () => {}}
+            >Claim</div>
+          </div> : <div/>}
         </div>
       </div>
 
