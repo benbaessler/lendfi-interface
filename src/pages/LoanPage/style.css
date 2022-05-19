@@ -2,12 +2,6 @@
   min-height: 450px;
 }
 
-.dashboardWrapper h3 {
-  font-size: 20px !important;
-  font-weight: 500 !important;
-  margin-bottom: 5px !important;
-}
-
 .dashboardWrapper h4 {
   font-size: 17px !important;
   font-weight: 400 !important;
@@ -28,7 +22,7 @@
   height: 10px;
   border-radius: 50%;
   background-color: white;
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .dbTitleContainer {
@@ -38,6 +32,7 @@
 
 .dbDetailsContainer {
   width: 55%;
+  height: 100%;
   display: flex;
   flex-wrap: wrap;
   padding-right: 20px;
@@ -46,7 +41,7 @@
 .dbDetailSection {
   width: 150px;
   margin-right: 50px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .dbDetailSection a {
@@ -66,14 +61,8 @@
 }
 
 .dbManageSection {
-  padding-top: 15px;
   width: 45%;
   height: 100%;
-}
-
-.dbManageSection h3 {
-  font-size: 18px !important;
-  margin-bottom: 12px !important;
 }
 
 .dbManageSection p {
@@ -93,4 +82,8 @@
 
 .inactive p {
   opacity: .6 !important;
+}
+
+.disabledSection {
+  opacity: .6;
 }

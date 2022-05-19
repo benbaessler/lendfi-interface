@@ -107,7 +107,7 @@ export default function Create() {
 
     <div className="interfaceContainer createWrapper">
 
-      <div className="createTopContainer">
+      <div className="topContainer">
         <h1>Create Loan</h1>
         <div className="button submitButton"
           onClick={active ? submitLoan : connectWallet}

@@ -4,24 +4,10 @@
   margin-left: 5px !important;
 }
 
-.createWrapper h3 {
-  font-weight: 400 !important;
-  font-size: 16px !important;
-  margin-bottom: 12px !important;
-}
-
 .createWrapper h4 {
   font-size: 12px !important;
   font-weight: 500 !important;
   opacity: .7 !important;
-}
-
-.createTopContainer {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
 }
 
 .createContentContainer {
