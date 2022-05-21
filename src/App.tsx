@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom'
 import { useEagerConnect, useInactiveListener } from './hooks'
 import Create from './pages/Create';
 import Loans from './pages/Loans';
+import About from './pages/About';
 import { LoanPage } from './pages/LoanPage';
 import NavigationBar from './components/NavigationBar';
 
@@ -18,6 +19,7 @@ function App() {
       <Route path="/loans" exact component={Loans}/>
       <Route path="/loan/:id" exact component={LoanPage}/>
       <Route path="/create" exact component={Create}/>
+      <Route path="/about" exact component={About}/>
     </div>
   </Switch>
 }
