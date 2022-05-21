@@ -4,6 +4,7 @@ import Logo from '../../assets/icons/logo.png'
 import { useWeb3React } from "@web3-react/core"
 import { shortenAddress } from '../../utils'
 import { useHistory } from "react-router-dom";
+import QuestionIcon from '../../assets/icons/question.png'
 
 export default function NavigationBar() {
   const { active, account, activate } = useWeb3React()
@@ -23,6 +24,7 @@ export default function NavigationBar() {
     </div>
 
     <div className="walletSection">
+      <img src={QuestionIcon} id="navQuestionBtn"/>
       {active ? <div className="userContainer">
         {shortenAddress(account!)}
       </div> : <div className="button submitButton" id="navbarConnectBtn" onClick={connectWallet}>

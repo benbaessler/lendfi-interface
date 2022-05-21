@@ -40,6 +40,8 @@
 
 .walletSection {
   margin-right: 30px;
+  display: flex;
+  align-items: center;
 }
 
 .userContainer {
@@ -50,4 +52,16 @@
   background-color: #121212;
   border-radius: 10px;
   opacity: .6;
+}
+
+#navQuestionBtn {
+  margin-right: 15px;
+  height: 25px;
+  opacity: .4;
+  transition: .2s;
+  cursor: pointer;
+}
+
+#navQuestionBtn:hover {
+  opacity: .7;
 }
