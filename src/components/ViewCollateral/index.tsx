@@ -1,5 +1,5 @@
 import './style.css'
-import { ModalProps } from '../../types/modal';
+import { ModalProps } from '../../utils/modal';
 import Close from '../../assets/icons/close.png'
 import { TokenCardProps } from '../../types'
 import { getOpenSeaLink } from '../../utils/tokens'

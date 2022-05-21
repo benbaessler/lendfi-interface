@@ -1,11 +1,11 @@
 import './style.css'
+import { useContext } from 'react'
 import { injected } from '../../connectors'
 import Logo from '../../assets/icons/logo.png'
 import { useWeb3React } from "@web3-react/core"
 import { shortenAddress } from '../../utils'
 import { useHistory } from "react-router-dom";
 import QuestionIcon from '../../assets/icons/question.png'
-import About from '../../pages/About'
 
 export default function NavigationBar() {
   const { active, account, activate } = useWeb3React()
@@ -19,17 +19,17 @@ export default function NavigationBar() {
   return <div className="navigationBarContainer">
     <img src={Logo} onClick={() => history.replace('')} id="logo"/>
 
-    <div>
+    {active ? <div>
       <span style={{ marginRight: '18px' }} onClick={() => history.replace('/loans')}>Loans</span>
       <span onClick={() => history.replace('/create')}>Create</span>
-    </div>
+    </div> : <div/>}
 
     <div className="walletSection">
       <img src={QuestionIcon} id="navQuestionBtn" onClick={() => history.replace('/about')}/>
       {active ? <div className="userContainer">
         {shortenAddress(account!)}
       </div> : <div className="button submitButton" id="navbarConnectBtn" onClick={connectWallet}>
-        Connect Wallet
+        Enter App
       </div>}
     </div>
   </div>

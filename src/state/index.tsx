@@ -1,12 +1,16 @@
 import { CollateralContext, useCollateralState } from "./collateral"
+import { EnteredContext, useEnteredState } from "./entered"
 
 export const GlobalStore = ({ children }: any) => {
   const [collateral, setCollateral] = useCollateralState()
+  const [entered, setEntered] = useEnteredState()
 
   return (
-    <CollateralContext.Provider value={[collateral, setCollateral]}>
-      {children}
-    </CollateralContext.Provider>
+    <EnteredContext.Provider value={[entered, setEntered]}>
+      <CollateralContext.Provider value={[collateral, setCollateral]}>
+        {children}
+      </CollateralContext.Provider>
+    </EnteredContext.Provider>
   )
 }
 

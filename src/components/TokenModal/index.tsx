@@ -4,7 +4,7 @@ import { AlchemyAPIToken, TokenCardProps } from '../../types'
 import { CollateralContext } from '../../state/collateral';
 import Close from '../../assets/icons/close.png'
 import Checkmark from '../../assets/icons/checkmark.png'
-import { ModalProps } from '../../types/modal';
+import { ModalProps } from '../../utils/modal';
 import { networkName, openseaBaseUrl } from '../../constants';
 import { getOpenSeaLink } from '../../utils/tokens';
 import { Spinner } from 'react-bootstrap';
