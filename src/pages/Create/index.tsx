@@ -8,6 +8,9 @@ import { getTokens } from '../../utils/tokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
 import { CollateralContext } from '../../state/collateral'
 import getContract from '../../utils/getContract';
+import CheckmarkIcon from '../../assets/icons/checkmark.png'
+import InvalidIcon from '../../assets/icons/invalid.png'
+import { isAddress } from '../../utils'
 
 export default function Create() {
   const { active, account, activate, library } = useWeb3React()
@@ -24,28 +27,15 @@ export default function Create() {
   const [amountInput, setAmountInput] = useState<string>()
   const [interestInput, setInterestInput] = useState<string>()
   const [deadlineInput, setDeadlineInput] = useState<any>()
+
+  // Address input + checker
   const [addressInput, setAddressInput] = useState<string>()
+  const [addressValid, setAddressValid] = useState<boolean>()
+  const [addressChecked, setAddressChecked] = useState<boolean>(false)
 
   // Collateral
   const [collateral, setCollateral] = useContext(CollateralContext)
   const [showModal, setShowModal] = useState<boolean>(false)
-
-  const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
-  
-  const onAddressChange = (event: any) => setAddressInput(event.target.value)
-
-
-  // Fix later
-  const onAmountChange = (event: any) => {
-    let input = event.target.value
-    input.replace(',', '.')
-
-    setAmountInput(input)
-  }
-
-  const onInterestChange = (event: any) => {
-    setInterestInput(event.target.value)
-  }
 
   const connectWallet = async () => {
     try { await activate(injected) }
@@ -97,8 +87,14 @@ export default function Create() {
   }, [borrower])
 
   useEffect(() => {
-    if (role === 'Lender') setBorrower(addressInput)
-    else setLender(addressInput)
+    if (addressInput === '') setAddressChecked(false)
+
+    const acTimeout = setTimeout(() => {
+      setAddressChecked(true)
+      setAddressValid(isAddress(addressInput!))
+    }, 2000)
+
+    return () => clearTimeout(acTimeout)
   }, [addressInput])
 
   const CollateralToken = ({ data }: TokenCardProps) => {
@@ -146,7 +142,14 @@ export default function Create() {
           <div className="amountContainer">
             <h3>Loan Amount</h3>
             <div className="input">
-              <input type="number" placeholder="0" value={amountInput} onChange={onAmountChange}/>
+              <input 
+                type="number"
+                pattern="/^\d*\.?\d*$/"
+                placeholder="0" 
+                min="0"
+                value={amountInput} 
+                onChange={event => setAmountInput(event.target.value)}
+              />
               ETH
             </div>
           </div>
@@ -154,7 +157,7 @@ export default function Create() {
           <div className="amountContainer">
             <h3>Interest Rate</h3>
             <div className="input">
-              <input type="number" placeholder="0" value={interestInput} onChange={onInterestChange}/>
+              <input type="number" min="0" placeholder="0" value={interestInput} onChange={event => setInterestInput(event.target.value)}/>
               %
             </div>
           </div>
@@ -162,7 +165,7 @@ export default function Create() {
           <div className="deadlineContainer">
             <h3>Deadline</h3>
             <div className="input" style={{ marginBottom: '12px' }}>
-              <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>
+              <input type="datetime-local" value={deadlineInput} onChange={event => setDeadlineInput(event.target.value)}/>
             </div>
             <p>Note that the lender can extend the deadline at any time.</p>
           </div>
@@ -176,7 +179,13 @@ export default function Create() {
             <div className="input">
               <input type="text" 
                 value={addressInput}
-                onChange={onAddressChange}/>
+                onChange={event => setAddressInput(event.target.value)}
+                style={{ paddingRight: '10px' }}
+              />
+              <img 
+                src={addressValid ? CheckmarkIcon : InvalidIcon}
+                style={{ display: addressChecked ? '' : 'none' }}
+              />
             </div>
           </div>
 

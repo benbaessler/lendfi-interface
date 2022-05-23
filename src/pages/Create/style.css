@@ -48,6 +48,10 @@
   margin-bottom: 25px;
 }
 
+.addressContainer img {
+  width: 20px;
+}
+
 .collateralTopSection {
   display: flex;
   justify-content: space-between;
