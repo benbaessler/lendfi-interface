@@ -4,7 +4,7 @@ import { utils, BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core'
 import { injected } from '../../connectors'
 import TokenModal from '../../components/TokenModal'
-import { getTokens } from '../../utils/tokens'
+import { getOpenSeaLink, getTokens } from '../../utils/tokens'
 import { AlchemyAPIToken, TokenCardProps, TokenStruct } from '../../types'
 import { CollateralContext } from '../../state/collateral'
 import getContract from '../../utils/getContract';
@@ -46,10 +46,6 @@ export default function Create() {
     setSubmitBtnText('Submitting...')
     setSubmitBtnActive(false)
 
-    const balance = await library.getBalance(account)
-    if (Number(utils.parseEther(amountInput as string)) > Number(balance)) setAmountError(true)
-    else setAmountError(false)
-
     try {
       const factoryContract = getContract(library.getSigner())
   
@@ -78,6 +74,9 @@ export default function Create() {
       setSubmitBtnActive(true)
       setTimeout(() => setSubmitBtnText('Submit Loan'), 1000)
     }
+    const balance = await library.getBalance(account)
+    if (Number(utils.parseEther(amountInput as string)) > Number(balance)) setAmountError(true)
+    else setAmountError(false)
   }
 
   useEffect(() => {
@@ -115,12 +114,17 @@ export default function Create() {
   }, [addressInput])
 
   const CollateralToken = ({ data }: TokenCardProps) => {
-    return <div className="collatContainer">
+    return <div className="collatContainer"><a 
+      href={getOpenSeaLink(data)}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <img id="collatImage" src={data.media[0].gateway}/>
       <div className="collatInfo">
         <p>{data.title}</p>
         {/* <p id="floorPrice">{data.floor} ETH</p> */}
       </div>
+    </a>
     </div>
   }
 

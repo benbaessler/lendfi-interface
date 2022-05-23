@@ -121,14 +121,18 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       setConfirmBtnText('Approving...')
 
       // Approving NFT for interaction with smart contract
-      await collateralContract.setApprovalForAll(factoryAddress, true).then(() => {
+      try {
+        const tx = await collateralContract.setApprovalForAll(factoryAddress, true)
+        await tx.wait()
+
         setTokensApproved(true)
         setConfirmBtnText('Confirm')
         setConfirmBtnActive(true)
-      }).catch((error: any) => {
+      } catch (error) {
         setConfirmBtnActive(true)
         setConfirmBtnText('Approve')
-      })
+      }
+      
     } else {
       const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
       if (!approved)
@@ -258,7 +262,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           {loan!.lender === account ? <div className={loan!.executed ? 'disabledSection' : ''}>
             <div className="extendDeadlineTitleWrapper">
               <h3>Extend Deadline</h3>
-              <p style={{ display: deadlineError ? '' : 'none'}}>You can not shorten the deadline</p>
+              <p className="errorMessage" style={{ display: deadlineError ? '' : 'none'}}>You can not shorten the deadline</p>
             </div>
             <div className="input" style={{ height: '35px', marginBottom: '12px' }}>
               <input type="datetime-local" value={deadlineInput} onChange={onDeadlineChange}/>

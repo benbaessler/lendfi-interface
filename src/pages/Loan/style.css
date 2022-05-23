@@ -102,13 +102,3 @@
   justify-content: space-between;
   align-items: end;
 }
-
-.extendDeadlineTitleWrapper p {
-  text-align: right;
-  margin: 0;
-  width: 50%;
-  font-size: 11px;
-  max-lines: 2;
-  color: #ff7086;
-  font-weight: 500;
-}

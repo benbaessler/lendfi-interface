@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { BigNumber } from 'ethers'
 import { networkName, openseaBaseUrl } from '../constants'
 import { AlchemyAPIToken } from '../types'
 
@@ -15,7 +16,6 @@ export const getToken = async (address: string, tokenId: number) => {
 }
 
 export const getOpenSeaLink = (data: AlchemyAPIToken) => {
-  const _tokenId = data.id.tokenId === "0x0000000000000000000000000000000000000000000000000000000000000000" ? '0' : data.id.tokenId
-  const result = openseaBaseUrl + `assets/${networkName}/${data.contract.address}/${_tokenId}`
+  const result = openseaBaseUrl + `assets/${networkName}/${data.contract.address}/${BigNumber.from(data.id.tokenId)}`
   return result
 }

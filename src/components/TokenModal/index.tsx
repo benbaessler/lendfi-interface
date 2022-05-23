@@ -28,7 +28,7 @@ export default function TokenModal({ data, show, onClose, loading }: ModalProps)
         const itemIndex = _collateral.indexOf(data)
         if (itemIndex > -1) _collateral.splice(itemIndex, 1)
       } else {
-        _collateral.push(data)
+        _collateral[0] = data
         onClose()
       }
 
