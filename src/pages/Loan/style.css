@@ -31,7 +31,6 @@
 }
 
 .dbDetailsContainer {
-  width: 55%;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -40,7 +39,6 @@
 
 .dbDetailSection {
   width: 150px;
-  margin-right: 50px;
   margin-bottom: 30px;
 }
 

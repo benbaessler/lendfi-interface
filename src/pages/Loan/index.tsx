@@ -30,12 +30,11 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   // Loan Details
   const [statusDetails, setStatusDetails] = useState<string[]>()
+  const [isParticipant, setIsParticipant] = useState<boolean>(false)
 
   // Collateral
   const [collateralData, setCollateralData] = useState<AlchemyAPIToken>()
   const [showCollateral, setShowCollateral] = useState<boolean>(false)
-
-  // Loan Manager
 
   // Confirm Button state
   const [tokensApproved, setTokensApproved] = useState<boolean>(true)
@@ -54,31 +53,40 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   const [deadlineError, setDeadlineError] = useState<boolean>(false)
   const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
 
+  // Updating UI status
+  const updateManageInterface = async (data: Loan) => {
+    const collateralContract = new Contract(data.collateral[0], ERC721ABI, library.getSigner())
+
+    setIsParticipant(true)
+    if (data.lender === account && data.lenderConfirmed) setConfirmed()
+    else if (data.borrower === account && data.borrowerConfirmed) setConfirmed()
+    if (data.borrower === account && !data.borrowerConfirmed) {
+      const approved: boolean = await collateralContract.isApprovedForAll(data.borrower, factoryAddress)
+      setTokensApproved(approved)
+      if (!approved) setConfirmBtnText('Approve')
+    }
+    if (Number(data.deadline) < Math.round(Date.now() / 1000) && data.active) {
+      setClaimBtnActive(true)
+    }
+    if (data.collateralClaimed) setClaimBtnText('Claimed')
+    if (data.executed && !data.collateralClaimed) setClaimBtnText('Loan paid')
+  }
+
   const init = async () => {
     // Getting Loan data
     const factoryContract = getContract(library.getSigner())
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
 
+    console.log(_loan)
+
     // Getting Loan status
     const _statusDetails = getStatusDetails(_loan)
     setStatusDetails(_statusDetails)
+
+    if (_loan.lender === account || _loan.borrower === account) updateManageInterface(_loan)
     
     const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
-    
-    // Updating UI status
-    if (_loan.lender === account && _loan.lenderConfirmed) setConfirmed()
-    else if (_loan.borrower === account && _loan.borrowerConfirmed) setConfirmed()
-    if (_loan.borrower === account && !_loan.borrowerConfirmed) {
-      const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
-      setTokensApproved(approved)
-      if (!approved) setConfirmBtnText('Approve')
-    }
-    if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && _loan.active) {
-      setClaimBtnActive(true)
-    }
-    if (_loan.collateralClaimed) setClaimBtnText('Claimed')
-    if (_loan.executed && !_loan.collateralClaimed) setClaimBtnText('Loan paid')
 
     // Getting Collateral NFT metadata
     const tokenMetadata = await getToken(_loan.collateral[0], _loan.collateral[1])
@@ -182,7 +190,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // ! : Add Redirect for non-existing Loan ID.
 
   return <>
-    <div className="interfaceContainer dashboardWrapper">
+    <div className="interfaceContainer dashboardWrapper" style={{ width: isParticipant ? '80%' : '40%'}}>
     {loading ? <Spinner animation="border" variant="light" style={{
       position: 'absolute',
       right: '50%',
@@ -200,8 +208,8 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       </div>
 
       <div className="dbContentWrapper">
-        <div className="dbDetailsContainer">
-          <div className="dbDetailSection">
+        <div className="dbDetailsContainer" style={{ width: isParticipant ? '55%' : '100%'}}>
+          <div className="dbDetailSection" style={{ marginRight: '50px'}}>
             <h3>Lender</h3>
             {/* Remove rinkeby for production version */}
             <h4><a href={etherscanBaseUrl + `address/${loan!.lender}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.lender)}</a></h4>
@@ -210,7 +218,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
             <h3>Borrower</h3>
             <h4><a href={etherscanBaseUrl + `address/${loan!.borrower}`} target="_blank" rel="noopener noreferrer">{shortenAddress(loan!.borrower)}</a></h4>
           </div>
-          <div className="dbDetailSection">
+          <div className="dbDetailSection" style={{ marginRight: '50px'}}>
             <h3>Amount</h3>
             <h4>{utils.formatEther(loan!.amount)} ETH</h4>
           </div>
@@ -234,7 +242,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
             >View</div>
           </div>
         </div>
-        <div className="dbManageSection">
+        {isParticipant ? <div className="dbManageSection">
           <div className={loan!.active || loan!.executed || statusDetails![0] === 'Expired' ? 'disabledSection' : ''}>
             <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
             <p>{loan!.lender === account ? 
@@ -278,7 +286,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
                 onClick={claimBtnActive ? claimCollateral : () => {}}
               >{claimBtnText}</div>
             </div> : <div/>}
-          </div>
+          </div> : <div/>}
         </div>
       </div>}
     </div>
