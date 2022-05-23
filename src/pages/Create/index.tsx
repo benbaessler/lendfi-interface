@@ -13,7 +13,7 @@ import InvalidIcon from '../../assets/icons/invalid.png'
 import { isAddress } from '../../utils'
 
 export default function Create() {
-  const { active, account, activate, library } = useWeb3React()
+  const { account,library } = useWeb3React()
 
   // Role input
   const [role, setRole] = useState<string>()
@@ -30,40 +30,49 @@ export default function Create() {
 
   // Address input + checker
   const [addressInput, setAddressInput] = useState<string>()
-  const [addressValid, setAddressValid] = useState<boolean>()
+  const [addressValid, setAddressValid] = useState<boolean>(false)
   const [addressChecked, setAddressChecked] = useState<boolean>(false)
 
   // Collateral
   const [collateral, setCollateral] = useContext(CollateralContext)
   const [showModal, setShowModal] = useState<boolean>(false)
 
-  const connectWallet = async () => {
-    try { await activate(injected) }
-    catch (error) { console.error(error) }
-  }
+  // Submit button
+  const [submitBtnText, setSubmitBtnText] = useState<string>('Submit Loan')
+  const [submitBtnActive, setSubmitBtnActive] = useState<boolean>(true)
 
   const submitLoan = async () => {
-    const factoryContract = getContract(library.getSigner())
+    setSubmitBtnText('Submitting...')
+    setSubmitBtnActive(false)
 
-    // Parsing input data
-    const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
-    const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
-    const parsedCollateral: TokenStruct[] = collateral.map((token: AlchemyAPIToken) => ({
-      contractAddress: token.contract.address,
-      tokenId: Number(token.id.tokenId)
-    }))
-    const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
-
-    await factoryContract.submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline)
-    console.log('Successfully submitted a new loan')
-
-    // Clearing inputs
-    setRole('')
-    setAmountInput('')
-    setInterestInput('')
-    setDeadlineInput(0)
-    setAddressInput('')
-    setCollateral([])
+    try {
+      const factoryContract = getContract(library.getSigner())
+  
+      // Parsing input data
+      const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
+      const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
+      const parsedCollateral: TokenStruct[] = collateral.map((token: AlchemyAPIToken) => ({
+        contractAddress: token.contract.address,
+        tokenId: Number(token.id.tokenId)
+      }))
+      const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
+  
+      await factoryContract.submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline).then(() => {
+        // Clearing inputs
+        setSubmitBtnActive(true)
+        setSubmitBtnText('Submit Loan')
+        setRole('')
+        setAmountInput('')
+        setInterestInput('')
+        setDeadlineInput(0)
+        setAddressInput('')
+        setCollateral([])
+      })
+    } catch (error) {
+      setSubmitBtnText('Failed')
+      setSubmitBtnActive(true)
+      setTimeout(() => setSubmitBtnText('Submit Loan'), 1000)
+    }
   }
 
   useEffect(() => {
@@ -87,7 +96,10 @@ export default function Create() {
   }, [borrower])
 
   useEffect(() => {
-    if (addressInput === '') setAddressChecked(false)
+    if (['', undefined].includes(addressInput)) { 
+      setAddressChecked(false)
+      return
+    }
 
     const acTimeout = setTimeout(() => {
       setAddressChecked(true)
@@ -120,8 +132,9 @@ export default function Create() {
       <div className="topContainer">
         <h1>Create Loan</h1>
         <div className="button submitButton"
-          onClick={active ? submitLoan : connectWallet}
-        >{active ? 'Submit Loan' : 'Connect Wallet'}</div>
+          id={!submitBtnActive ? 'disabled' : ''}
+          onClick={submitBtnActive ? submitLoan : () => {}}
+        >{submitBtnText}</div>
       </div>
 
       <div className="createContentContainer">  
