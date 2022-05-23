@@ -214,7 +214,10 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           </div>
           <div className="dbDetailSection" style={{ width: '100%' }}>
             <h3>Deadline</h3>
-            <h4>{formatDeadline(loan!.deadline).toLocaleString()}</h4>
+            <h4 style={{ 
+              color: statusDetails![0] === 'Expired' ? '#ff0000' : '',
+              opacity: statusDetails![0] === 'Expired' ? .7 : 1
+            }}>{formatDeadline(loan!.deadline).toLocaleString()}</h4>
           </div>
           <div className="dbDetailSection" id="collatDetailSection">
             <h3>Collateral</h3>
@@ -226,7 +229,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           </div>
         </div>
         <div className="dbManageSection">
-          <div className={loanActive || loan!.executed ? 'disabledSection' : ''}>
+          <div className={loanActive || loan!.executed || statusDetails![0] === 'Expired' ? 'disabledSection' : ''}>
             <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
             <p>{loan!.lender === account ? 
               `Confirm the Loan by transferring ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
@@ -251,7 +254,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
               id={loan!.executed ? 'disabled': ''}
               onClick={extendDeadline}
             >Update</div>
-            </div> : <div className={!loan!.active || loan!.executed ? 'disabledSection': ''}>
+            </div> : <div className={!loan!.active || loan!.executed || statusDetails![0] === 'Expired' ? 'disabledSection': ''}>
               <h3>Pay Loan</h3>
               <p>You will receive your Collateral NFT as soon as the Loan is paid.</p>
               <div 
@@ -260,7 +263,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
                 onClick={loan!.active ? paybackLoan : () => {}}
               >{loan!.loanPaid ? 'Paid' : 'Transfer'}</div>
             </div>}
-            {loan!.lender === account ? <div className={!loan!.active && statusDetails![0] !== 'Expired' ? 'disabledSection' : ''}>
+            {loan!.lender === account ? <div className={loan!.active && statusDetails![0] === 'Expired' ? '' : 'disabledSection'}>
               <h3>Claim Collateral</h3>
               <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
               <div 

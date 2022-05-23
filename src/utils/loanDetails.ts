@@ -8,12 +8,12 @@ export const getStatusDetails = (data: Loan) => {
   if (data.active && !expired) {
     status = 'Active'
     statusColor = '#14c443'
-  } else if (data.active && expired) {
-    status = 'Expired'
-    statusColor = 'rgba(256, 256, 256, .5)'
   } else if (data.executed) {
     status = 'Executed'
     statusColor = '#ff0000'
+  } else if (expired) {
+    status = 'Expired'
+    statusColor = 'rgba(256, 256, 256, .5)'
   } else {
     status = 'Initialized'
     statusColor = 'white'
