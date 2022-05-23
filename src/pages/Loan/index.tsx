@@ -13,6 +13,7 @@ import { etherscanBaseUrl, factoryAddress } from '../../constants'
 import CollateralPopup from '../../components/ViewCollateral';
 import { getToken } from '../../utils/tokens'
 import { AlchemyAPIToken } from '../../types'
+import { CollateralContext } from '../../state/collateral';
 
 interface RouteParams { id: string }
 
@@ -76,22 +77,14 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && _loan.active) {
       setClaimBtnActive(true)
     }
+    if (_loan.collateralClaimed) setClaimBtnText('Claimed')
+    if (_loan.executed && !_loan.collateralClaimed) setClaimBtnText('Loan paid')
 
     // Getting Collateral NFT metadata
     const tokenMetadata = await getToken(_loan.collateral[0], _loan.collateral[1])
     setCollateralData(tokenMetadata)
 
     setLoading(false)
-  }
-
-  const updateData = async () => {
-    // Getting Loan data
-    const factoryContract = getContract(library.getSigner())
-    const _loan = await factoryContract.getLoan(loanId)
-    setLoan(_loan)
-
-    const _statusDetails = getStatusDetails(_loan)
-    setStatusDetails(_statusDetails)
   }
 
   const setConfirmed = () => {
@@ -106,7 +99,6 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const factoryContract = getContract(library.getSigner())
     await factoryContract.confirmLender(loanId, { value: BigNumber.from(loan!.amount).add(loan!.amount / 100)}).then(() => {
       setConfirmed()
-      updateData()
     }).catch((error: any) => {
       setConfirmBtnText('Confirm')
       setConfirmBtnActive(true)
@@ -139,7 +131,6 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       const factoryContract = getContract(library.getSigner())
       await factoryContract.confirmBorrower(loanId).then(() => {
         setConfirmed()
-        updateData()
       }).catch((error: any) => {
         setConfirmBtnActive(true)
         setConfirmBtnText('Confirm')
@@ -148,31 +139,35 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   }
 
   const claimCollateral = async () => {
-
+    setClaimBtnText('Claiming...')
+    setClaimBtnActive(false)
 
     const factoryContract = getContract(library.getSigner())
-    await factoryContract.claimCollateral(loanId)
+    await factoryContract.claimCollateral(loanId).then(() => {
+      setClaimBtnText('Claimed')
+    }).catch((error: any) => {
+      setClaimBtnActive(true)
+      setClaimBtnText('Claim')
+    })
   }
 
   const extendDeadline = async () => {
     setExtendBtnText('Updating...')
     setExtendBtnActive(false)
+    setDeadlineError(false)
 
     const factoryContract = getContract(library.getSigner())
     const unixDeadline = Math.round((new Date(deadlineInput!)).getTime() / 1000)
 
     await factoryContract.extendDeadline(loanId, unixDeadline).then(() => {
-      updateData()
       setExtendBtnText('Update')
       setExtendBtnActive(true)
-      setDeadlineError(false)
     }).catch((error: any) => {
       if (error.message.split('[')[0] === 'cannot estimate gas; transaction may fail or may require manual gas limit ') {
         setDeadlineError(true)
       }
       setExtendBtnText('Update')
       setExtendBtnActive(true)
-      return
     })
   }
 
@@ -240,7 +235,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
           </div>
         </div>
         <div className="dbManageSection">
-          <div className={loan!.active || statusDetails![0] === 'Expired' ? 'disabledSection' : ''}>
+          <div className={loan!.active || loan!.executed || statusDetails![0] === 'Expired' ? 'disabledSection' : ''}>
             <h3>Confirmations: <b>({getConfirmations(loan!)}/2)</b></h3>
             <p>{loan!.lender === account ? 
               `Confirm the Loan by transferring ${utils.formatEther(loan!.amount)} ETH into the Loan Contract.` :
@@ -263,7 +258,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
             <div 
               className="button submitButton dbButton" 
               id={loan!.executed || !extendBtnActive ? 'disabled': ''}
-              onClick={extendDeadline}
+              onClick={loan!.executed || !extendBtnActive ? () => {} : extendDeadline}
             >{extendBtnText}</div>
             </div> : <div className={!loan!.active || loan!.executed || statusDetails![0] === 'Expired' ? 'disabledSection': ''}>
               <h3>Pay Loan</h3>
