@@ -1,11 +1,16 @@
 import { Loan } from "../types/loan"
 
 export const getStatusDetails = (data: Loan) => {
+  const expired: boolean = Number(data.deadline) < Math.round(Date.now() / 1000)
+
   let status: string
   let statusColor: string
-  if (data.active) {
+  if (data.active && !expired) {
     status = 'Active'
     statusColor = '#14c443'
+  } else if (data.active && expired) {
+    status = 'Expired'
+    statusColor = 'rgba(256, 256, 256, .5)'
   } else if (data.executed) {
     status = 'Executed'
     statusColor = '#ff0000'

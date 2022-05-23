@@ -1,6 +1,6 @@
 import './style.css'
 import { useWeb3React } from '@web3-react/core'
-import { providers, utils, Signer } from 'ethers';
+import { utils } from 'ethers';
 import getContract from '../../utils/getContract'
 import { useEffect, useState } from 'react'
 import { Loan } from '../../types/loan'
@@ -9,8 +9,6 @@ import { getStatusDetails, formatDeadline } from '../../utils/loanDetails';
 import { useHistory } from "react-router-dom";
 import CollateralPopup from '../../components/ViewCollateral';
 import { getToken } from '../../utils/tokens';
-import { Invite } from 'discord.js';
-import { createImportSpecifier } from 'typescript';
 
 /*
   Parameters:
@@ -48,13 +46,18 @@ export default function Loans() {
 
   useEffect(() => { if (active) getLoans() }, [active])
 
-  const LoanComponent = ({ data }: LoanComponentProps) => {    
+  const LoanComponent = ({ data }: LoanComponentProps) => { 
     const formattedDeadline = formatDeadline(data.deadline)
     const [userDisplay, setUserDisplay] = useState<string>()
     const [status, statusColor] = getStatusDetails(data)
     const [showCollateral, setShowCollateral] = useState<boolean>(false)
     const [metadata, setMetadata] = useState()
     const [collatLoading, setCollatLoading] = useState<boolean>(true)
+
+    if (Number(data.id) === 3) {
+      console.log(status)
+      console.log(Number(data.deadline) < Math.round((Date.now() / 1000)))
+    }
 
     const init = async () => {
       const _metadata = await getToken(data.collateral[0], Number(data.collateral[1]))
@@ -67,14 +70,16 @@ export default function Loans() {
     return (
       <>
         <CollateralPopup data={metadata} show={showCollateral} onClose={() => setShowCollateral(false)} loading={collatLoading}/>
-        <div className="loanContainer" onClick={() => history.replace(`loan/${data.id}`)}>
+        <div className="loanContainer" onClick={() => history.push(`loan/${data.id}`)}>
           <div className="loanContentContainer">
             <div id="loansStatusInd" style={{ backgroundColor: statusColor }}/>
             <span id="c-1">{account === data.lender ? 'To' : 'From'}</span>
             <span id="c-2">{account === data.lender ? shortenAddress(data.borrower, 3) : shortenAddress(data.lender, 3)}</span>
             <span id="c-3">{utils.formatEther(data.amount)} ETH</span>
             <span id="c-4">{utils.formatEther(data.interest)} ETH</span>
-            <span id="c-5">{formattedDeadline.toLocaleString()}</span>
+            <span id="c-5" style={{ 
+              opacity: status === 'Expired' ? .5 : 1
+            }}>{formattedDeadline.toLocaleString()}</span>
           </div>
         </div>
       </>

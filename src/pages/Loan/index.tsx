@@ -32,38 +32,111 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // Loan Details
   const [statusDetails, setStatusDetails] = useState<string[]>()
 
+  // Collateral
   const [collateralData, setCollateralData] = useState<AlchemyAPIToken>()
   const [showCollateral, setShowCollateral] = useState<boolean>(false)
 
   // Loan Manager
-  const [confirmed, setConfirmed] = useState<boolean>(false)
-  const [loanActive, setLoanActive] = useState<boolean>(false)
 
+  // Confirm Button state
   const [tokensApproved, setTokensApproved] = useState<boolean>(true)
 
-  const [deadlineError, setDeadlineError] = useState<boolean>(false)
-  const [claimActive, setClaimActive] = useState<boolean>(false)
+  const [confirmBtnText, setConfirmBtnText] = useState<string>('Confirm')
+  const [confirmBtnActive, setConfirmBtnActive] = useState<boolean>(true)
 
+  // Remove this
+  const [loanActive, setLoanActive] = useState<boolean>(false)
+
+  // Remove this
+  const [claimActive, setClaimActive] = useState<boolean>(false)
+  
+  // Extend deadline input
   const [deadlineInput, setDeadlineInput] = useState<string>('')
+  const [deadlineError, setDeadlineError] = useState<boolean>(false)
   const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
 
-  const confirmLender = async () => {
+  const init = async () => {
+    // Getting Loan data
     const factoryContract = getContract(library.getSigner())
-    await factoryContract.confirmLender(loanId, { value: BigNumber.from(loan!.amount).add(loan!.amount / 100)})
+    const _loan = await factoryContract.getLoan(loanId)
+    setLoan(_loan)
 
-    console.log(`Successfully confirmed Loan by depositing ${utils.formatEther(loan!.amount)} ETH into the Loan Contract!`)
+    // Getting Loan status
+    const _statusDetails = getStatusDetails(_loan)
+    setStatusDetails(_statusDetails)
+    
+    const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
+    
+    // Updating UI status
+    if (_loan.lender === account && _loan.lenderConfirmed) setConfirmed()
+    else if (_loan.borrower === account && _loan.borrowerConfirmed) setConfirmed()
+    if (_loan.borrower === account && !_loan.borrowerConfirmed) {
+      const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
+      setTokensApproved(approved)
+      if (!approved) setConfirmBtnText('Approve')
+    }
+    if (_loan.active) setLoanActive(true)
+    if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && !_loan.executed) setClaimActive(true)
+
+    // Getting Collateral NFT metadata
+    const tokenMetadata = await getToken(_loan.collateral[0], _loan.collateral[1])
+    setCollateralData(tokenMetadata)
+
+    setLoading(false)
+  }
+
+  const updateStatus = () => {
+    const _statusDetails = getStatusDetails(loan!)
+    setStatusDetails(_statusDetails)
+  }
+
+  const setConfirmed = () => {
+    setConfirmBtnActive(false)
+    setConfirmBtnText('Confirmed')
+  }
+
+  const confirmLender = async () => {
+    setConfirmBtnActive(false)
+    setConfirmBtnText('Confirming...')
+
+    const factoryContract = getContract(library.getSigner())
+    await factoryContract.confirmLender(loanId, { value: BigNumber.from(loan!.amount).add(loan!.amount / 100)}).then(() => {
+      setConfirmed()
+    }).catch((error: any) => {
+      setConfirmBtnText('Confirm')
+      setConfirmBtnActive(true)
+    })
   }
 
   const confirmBorrower = async (_loan: Loan) => {
-    // Approving NFT for Contract
+    setConfirmBtnActive(false)
+    const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
+
     if (!tokensApproved) {
-      const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
-      await collateralContract.setApprovalForAll(factoryAddress, true)
+      setConfirmBtnText('Approving...')
+
+      // Approving NFT for interaction with smart contract
+      await collateralContract.setApprovalForAll(factoryAddress, true).then(() => {
+        setTokensApproved(true)
+        setConfirmBtnText('Confirm')
+        setConfirmBtnActive(true)
+      }).catch((error: any) => {
+        setConfirmBtnActive(true)
+        setConfirmBtnText('Approve')
+      })
     } else {
+      const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
+      if (!approved)
+
+      setConfirmBtnText('Confirming...')
+
       // Calling Contract function
       const factoryContract = getContract(library.getSigner())
       await factoryContract.confirmBorrower(loanId).then(() => {
-        setConfirmed(true)
+        setConfirmed()
+      }).catch((error: any) => {
+        setConfirmBtnActive(true)
+        setConfirmBtnText('Confirm')
       })
     }
   }
@@ -96,36 +169,6 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const factoryContract = getContract(library.getSigner())
     const tx = await factoryContract.paybackLoan(loanId, { value: BigNumber.from(loan!.amount).add(loan!.interest).add(loan!.amount / 200) })
     console.log(`Successfully paid back loan (${tx.hash})`)
-  }
-
-  const init = async () => {
-    // Getting Loan data
-    const factoryContract = getContract(library.getSigner())
-    const _loan = await factoryContract.getLoan(loanId)
-    setLoan(_loan)
-
-    const collateralContract = new Contract(_loan.collateral[0], ERC721ABI, library.getSigner())
-
-    // Getting Loan status
-    const _statusDetails = getStatusDetails(_loan)
-    setStatusDetails(_statusDetails)
-
-    // Updating UI status
-    if (_loan.lender === account && _loan.lenderConfirmed) setConfirmed(true)
-    else if (_loan.borrower === account && _loan.borrowerConfirmed) setConfirmed(true)
-    if (_loan.borrower === account && !_loan.borrowerConfirmed) {
-      const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
-      setTokensApproved(approved)
-      console.log(approved)
-    }
-    if (_loan.active) setLoanActive(true)
-    if (Number(_loan.deadline) < Math.round(Date.now() / 1000) && !_loan.executed) setClaimActive(true)
-
-    // Getting Collateral NFT metadata
-    const tokenMetadata = await getToken(_loan.collateral[0], _loan.collateral[1])
-    setCollateralData(tokenMetadata)
-
-    setLoading(false)
   }
 
   useEffect(() => { if (active) init() }, [active])
@@ -191,9 +234,9 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
             }</p>
             <div 
               className="button submitButton dbButton" 
-              id={confirmed ? 'disabled' : ''}
-              onClick={!confirmed ? loan!.lender === account ? confirmLender : () => confirmBorrower(loan!) : () => {}}
-            >{loan!.borrower === account && !tokensApproved ? 'Approve' : confirmed ? 'Confirmed' : 'Confirm'}</div>
+              id={!confirmBtnActive ? 'disabled' : ''}
+              onClick={confirmBtnActive ? loan!.lender === account ? confirmLender : () => confirmBorrower(loan!) : () => {}}
+            >{confirmBtnText}</div>
           </div>
           {loan!.lender === account ? <div className={loan!.executed ? 'disabledSection' : ''}>
             <div className="extendDeadlineTitleWrapper">
@@ -217,7 +260,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
                 onClick={loan!.active ? paybackLoan : () => {}}
               >{loan!.loanPaid ? 'Paid' : 'Transfer'}</div>
             </div>}
-            {loan!.lender === account ? <div className={!loan!.active || loan!.executed ? 'disabledSection' : ''}>
+            {loan!.lender === account ? <div className={!loan!.active && statusDetails![0] !== 'Expired' ? 'disabledSection' : ''}>
               <h3>Claim Collateral</h3>
               <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
               <div 

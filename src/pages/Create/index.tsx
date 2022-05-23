@@ -23,21 +23,17 @@ export default function Create() {
   // Input
   const [amountInput, setAmountInput] = useState<string>()
   const [interestInput, setInterestInput] = useState<string>()
-  const [deadlineInput, setDeadlineInput] = useState()
+  const [deadlineInput, setDeadlineInput] = useState<any>()
   const [addressInput, setAddressInput] = useState<string>()
 
   // Collateral
-  const [collateral] = useContext(CollateralContext)
+  const [collateral, setCollateral] = useContext(CollateralContext)
   const [showModal, setShowModal] = useState<boolean>(false)
 
   const onDeadlineChange = (event: any) => setDeadlineInput(event.target.value)
   
-  const onAddressChange = (event: any) => {
-    const input = event.target.value
-    if (role === 'Lender') {
-      setBorrower(input)
-    } else { setLender(input) }
-  }
+  const onAddressChange = (event: any) => setAddressInput(event.target.value)
+
 
   // Fix later
   const onAmountChange = (event: any) => {
@@ -58,6 +54,7 @@ export default function Create() {
 
   const submitLoan = async () => {
     const factoryContract = getContract(library.getSigner())
+
     // Parsing input data
     const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
     const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
@@ -69,6 +66,14 @@ export default function Create() {
 
     await factoryContract.submitLoan(lender, borrower, amountInWei, interestFee, parsedCollateral[0], unixDeadline)
     console.log('Successfully submitted a new loan')
+
+    // Clearing inputs
+    setRole('')
+    setAmountInput('')
+    setInterestInput('')
+    setDeadlineInput(0)
+    setAddressInput('')
+    setCollateral([])
   }
 
   useEffect(() => {
@@ -90,6 +95,11 @@ export default function Create() {
       })
     } else setBorrowerTokens([])
   }, [borrower])
+
+  useEffect(() => {
+    if (role === 'Lender') setBorrower(addressInput)
+    else setLender(addressInput)
+  }, [addressInput])
 
   const CollateralToken = ({ data }: TokenCardProps) => {
     return <div className="collatContainer">
@@ -165,7 +175,7 @@ export default function Create() {
             <h3>{role == 'Lender' ? 'Borrower Address' : 'Lender Address'}</h3>
             <div className="input">
               <input type="text" 
-                value={role === 'Lender' ? borrower : lender} 
+                value={addressInput}
                 onChange={onAddressChange}/>
             </div>
           </div>

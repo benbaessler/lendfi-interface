@@ -29,7 +29,7 @@ function App() {
       <NavigationBar/>
       {active ? 
       <>
-        <Route path="/" exact render={() => <Redirect to="/loans"/>}/>
+        <Route path="/" render={() => <Redirect to="/loans"/>}/>
         <Route path="/loans" exact component={Loans}/>
         <Route path="/loan/:id" exact component={LoanPage}/>
         <Route path="/create" exact component={Create}/>
