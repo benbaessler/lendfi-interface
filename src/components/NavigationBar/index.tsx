@@ -1,5 +1,6 @@
 import './style.css'
 import { useContext } from 'react'
+import { NavigationContext } from '../../state/navigation'
 import { injected } from '../../connectors'
 import Logo from '../../assets/icons/logo.png'
 import { useWeb3React } from "@web3-react/core"
@@ -10,6 +11,7 @@ import QuestionIcon from '../../assets/icons/question.png'
 export default function NavigationBar() {
   const { active, account, activate } = useWeb3React()
   const history = useHistory()
+  const [navSelection] = useContext(NavigationContext)
 
   const connectWallet = async () => {
     try { await activate(injected) }
@@ -20,8 +22,13 @@ export default function NavigationBar() {
     <img src={Logo} onClick={() => history.replace('')} id="logo"/>
 
     {active ? <div>
-      <span style={{ marginRight: '18px' }} onClick={() => history.replace('/loans')}>Loans</span>
-      <span onClick={() => history.replace('/create')}>Create</span>
+      <span style={{ 
+        marginRight: '18px',
+        opacity: navSelection === 'loans' ? 1 : .7
+      }} onClick={() => history.replace('/loans')}>Loans</span>
+      <span style={{
+        opacity: navSelection === 'create' ? 1 : .7
+      }} onClick={() => history.replace('/create')}>Create</span>
     </div> : <div/>}
 
     <div className="walletSection">

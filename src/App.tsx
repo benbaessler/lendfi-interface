@@ -10,9 +10,11 @@ import Landing from './pages/Landing';
 import { useWeb3React } from '@web3-react/core';
 import { useEffect, useContext } from 'react'
 import { EnteredContext } from './state/entered' 
+import { NavigationContext } from './state/navigation';
 
 function App() {
   const [entered, setEntered] = useContext(EnteredContext)
+  const [navSelected, setNavSelected] = useContext(NavigationContext)
 
   // Ethereum & Contract
   const { active } = useWeb3React()
@@ -29,11 +31,25 @@ function App() {
       <NavigationBar/>
       {active ? 
       <>
-        <Route path="/" render={() => <Redirect to="/loans"/>}/>
-        <Route path="/loans" exact component={Loans}/>
-        <Route path="/loan/:id" exact component={LoanPage}/>
-        <Route path="/create" exact component={Create}/>
-        <Route path="/about" exact component={About}/> 
+        <Route path="/" render={() => {
+          return <Redirect to="/loans"/>
+        }}/>
+        <Route path="/loans" exact render={() => {
+          setNavSelected('loans')
+          return <Loans/>
+        }}/>
+        <Route path="/loan/:id" exact render={(props: any) => {
+          setNavSelected('loan')
+          return <LoanPage {...props}/>
+        }}/>
+        <Route path="/create" exact render={() => {
+          setNavSelected('create')
+          return <Create/>
+        }}/>
+        <Route path="/about" exact render={() => {
+          setNavSelected('about')
+          return <About/>
+        }}/> 
       </>
       : 
       <>

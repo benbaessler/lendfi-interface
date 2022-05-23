@@ -54,11 +54,6 @@ export default function Loans() {
     const [metadata, setMetadata] = useState()
     const [collatLoading, setCollatLoading] = useState<boolean>(true)
 
-    if (Number(data.id) === 3) {
-      console.log(status)
-      console.log(Number(data.deadline) < Math.round((Date.now() / 1000)))
-    }
-
     const init = async () => {
       const _metadata = await getToken(data.collateral[0], Number(data.collateral[1]))
       setMetadata(_metadata)
