@@ -33,6 +33,12 @@
   flex-wrap: wrap;
 }
 
+.noTokens {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .tokenContainer {
   position: relative;
   cursor: pointer;
@@ -88,4 +94,17 @@
   font-size: 15px;
   opacity: 1;
   font-weight: 600;
+}
+
+#noTokensImage {
+  width: 35%;
+  opacity: .2;
+  margin-bottom: 15px;
+}
+
+.noTokens span {
+  font-size: 15px;
+  text-align: center;
+  width: 60%;
+  opacity: .5;
 }

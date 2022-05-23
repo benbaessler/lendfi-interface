@@ -8,6 +8,7 @@ import { ModalProps } from '../../utils/modal';
 import { networkName, openseaBaseUrl } from '../../constants';
 import { getOpenSeaLink } from '../../utils/tokens';
 import { Spinner } from 'react-bootstrap';
+import NoTokensImage from '../../assets/images/no-tokens.png'
 
 export default function TokenModal({ data, show, onClose, loading }: ModalProps) {
   const [collateral, setCollateral] = useContext(CollateralContext)
@@ -62,9 +63,15 @@ export default function TokenModal({ data, show, onClose, loading }: ModalProps)
         position: 'absolute',
         right: '45%',
         bottom: '40%',
-      }}/> : <div className="modalContent">
-        {data.map((token: AlchemyAPIToken) => <TokenCard data={token}/>)}
-      </div>}
+      }}/> : <>{data.length > 0 ? 
+        <div className="modalContent">
+          {data.map((token: AlchemyAPIToken) => <TokenCard data={token}/>)}
+        </div> :
+        <div className="modalContent noTokens">
+          <img src={NoTokensImage} id="noTokensImage"/>
+          <span>This wallet does not own any tokens that could be used as collateral.</span>
+        </div>}</>
+      }
     </div>
   </div>
 }
