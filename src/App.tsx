@@ -24,39 +24,35 @@ function App() {
 
   useEffect(() => {
     if (active) setEntered(true)
-  }, [])
+  }, [active])
   
   return <Switch>
     <div className="App">
       <NavigationBar/>
-      {active ? 
-      <>
-        <Route path="/" render={() => {
-          return <Redirect to="/loans"/>
-        }}/>
-        <Route path="/loans" exact render={() => {
-          setNavSelected('loans')
-          return <Loans/>
-        }}/>
-        <Route path="/loan/:id" exact render={(props: any) => {
-          setNavSelected('loan')
-          return <LoanPage {...props}/>
-        }}/>
-        <Route path="/create" exact render={() => {
-          setNavSelected('create')
-          return <Create/>
-        }}/>
-        <Route path="/about" exact render={() => {
-          setNavSelected('about')
-          return <About/>
-        }}/> 
-      </>
-      : 
-      <>
-        <Route path="/" exact component={Landing}/>
-        <Route path="/" render={() => <Redirect to="/"/>}/>
-      </>
-      }
+      {entered ? 
+        <>
+          <Route path="/" exact render={() => {
+            return <Redirect to="/loans"/>
+          }}/> 
+          <Route path="/loans" exact render={() => {
+            setNavSelected('loans')
+            return <Loans/>
+          }}/>
+          <Route path="/loan/:id" exact render={(props: any) => {
+            setNavSelected('loan')
+            return <LoanPage {...props}/>
+          }}/>
+          <Route path="/create" exact render={() => {
+            setNavSelected('create')
+            return <Create/>
+          }}/>
+          <Route path="/about" exact render={() => {
+            setNavSelected('about')
+            return <About/>
+          }}/> 
+        </>
+      : <Route path="/" exact component={Landing}/>}
+      
     </div>
   </Switch>
 }

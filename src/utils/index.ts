@@ -2,7 +2,8 @@ import { getAddress } from '@ethersproject/address'
 
 export function isAddress(value: string) {
   try {
-    return getAddress(value)
+    const _ = getAddress(value)
+    return true
   } catch {
     return false
   }
@@ -10,10 +11,9 @@ export function isAddress(value: string) {
 
 export function shortenAddress(address: string, chars = 4) {
   if (address === '') return ''
-  const parsed = isAddress(address)
-  if (!parsed) {
-    console.log(address)
+  const valid = isAddress(address)
+  if (!valid) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
-  return `${parsed.substring(0, chars + 2)}...${parsed.substring(42 - chars)}`
+  return `${address.substring(0, chars + 2)}...${address.substring(42 - chars)}`
 }

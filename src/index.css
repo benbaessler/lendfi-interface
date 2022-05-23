@@ -31,3 +31,7 @@ input::-webkit-inner-spin-button {
 /* input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbYb7L0L7S2cia1h-TnnLBc6QHwcgzmtRVzw&usqp=CAU')
 } */
+
+::-webkit-calendar-picker-indicator {
+  display: none;
+}
