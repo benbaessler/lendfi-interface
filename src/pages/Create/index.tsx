@@ -27,6 +27,7 @@ export default function Create() {
   const [amountInput, setAmountInput] = useState<string>()
   const [amountError, setAmountError] = useState<boolean>(false)
   const [interestInput, setInterestInput] = useState<string>()
+  const [interestInEth, setInterestInEth] = useState<boolean>(false)
   const [deadlineInput, setDeadlineInput] = useState<any>()
 
   // Address input + checker
@@ -50,8 +51,13 @@ export default function Create() {
       const factoryContract = getContract(library.getSigner())
   
       // Parsing input data
-      const amountInWei = BigNumber.from(Number(utils.parseEther(amountInput as string)).toString())
-      const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
+      const amountInWei = utils.parseEther(amountInput!)
+
+      let interestFee: BigNumber
+      if (interestInEth) interestFee = utils.parseEther(interestInput!)
+      else interestFee = BigNumber.from((Number(utils.parseEther(amountInput!)) * Number(interestInput) / 100).toString())
+
+      // const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
       const parsedCollateral: TokenStruct[] = collateral.map((token: AlchemyAPIToken) => ({
         contractAddress: token.contract.address,
         tokenId: Number(token.id.tokenId)
@@ -83,7 +89,7 @@ export default function Create() {
     if (role === 'Lender') { 
       setLender(account as string) 
       setBorrower('')
-    } else {
+    } else if (role === 'Borrower') {
       setBorrower(account as string)
       setLender('')
     }
@@ -112,6 +118,23 @@ export default function Create() {
 
     return () => clearTimeout(acTimeout)
   }, [addressInput])
+
+  useEffect(() => {
+    if (interestInEth) {
+      if (!['', undefined].includes(interestInput)) {
+        setInterestInput((Number(amountInput) * Number(interestInput) / 100).toString())
+      }
+    } else {
+      if (!['', undefined].includes(interestInput)) {
+        setInterestInput((Number(interestInput) * 100 / Number(amountInput)).toString())
+      }
+    }
+  }, [interestInEth])
+
+  useEffect(() => {
+    console.log(borrower)
+    console.log(['', undefined].includes(borrower))
+  }, [])
 
   const CollateralToken = ({ data }: TokenCardProps) => {
     return <div className="collatContainer"><a 
@@ -169,7 +192,6 @@ export default function Create() {
             <div className="input">
               <input 
                 type="number"
-                pattern="/^\d*\.?\d*$/"
                 placeholder="0" 
                 min="0"
                 value={amountInput} 
@@ -178,12 +200,18 @@ export default function Create() {
               ETH
             </div>
           </div>
-
-          <div className="amountContainer">
-            <h3>Interest Rate</h3>
-            <div className="input">
-              <input type="number" min="0" placeholder="0" value={interestInput} onChange={event => setInterestInput(event.target.value)}/>
-              %
+          <div className={amountInput ? '' : 'disabledSection'}>
+            <div className="amountContainer">
+              <h3>Interest Rate</h3>
+              <div className="input">
+                <input disabled={['', undefined].includes(amountInput)} type="number" min="0" placeholder="0" value={interestInput} onChange={event => setInterestInput(event.target.value)}/>
+                <span 
+                  onClick={['', undefined].includes(amountInput) ? () => {} : () => setInterestInEth(!interestInEth)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {!interestInEth ? '%' : 'ETH'}
+                  </span>
+              </div>
             </div>
           </div>
 
@@ -198,38 +226,43 @@ export default function Create() {
         </div>
 
         <div className="createSectionContainer">
-
-          <div className="addressContainer">
-            <h3>{role == 'Lender' ? 'Borrower Address' : 'Lender Address'}</h3>
-            <div className="input">
-              <input type="text" 
-                value={addressInput}
-                onChange={event => setAddressInput(event.target.value)}
-                style={{ paddingRight: '10px' }}
-              />
-              <img 
-                src={addressValid ? CheckmarkIcon : InvalidIcon}
-                style={{ display: addressChecked ? '' : 'none' }}
-              />
-            </div>
-          </div>
-
-          <div className="collateralContainer" id={borrower ? 'shown' : 'hidden'}>
-            <div className="collateralTopSection">
-              <h3 style={{ margin: 0 }}>Collateral</h3>
-              <div className="valueAddCollateral">
-                <div 
-                  className="addButton" 
-                  onClick={borrower ? () => setShowModal(true) : () => {}}
-                >
-                  Add
-                </div>
+          <div className={role === undefined ? 'disabledSection' : ''}>
+            <div className="addressContainer">
+              <h3>{role ? role === 'Lender' ? 'Borrower Address' : 'Lender Address' : 'Address'}</h3>
+              <div className="input">
+                <input type="text" 
+                  disabled={role === undefined}
+                  value={addressInput}
+                  onChange={event => setAddressInput(event.target.value)}
+                  style={{ paddingRight: '10px' }}
+                />
+                <img 
+                  src={addressValid ? CheckmarkIcon : InvalidIcon}
+                  style={{ display: addressChecked ? '' : 'none' }}
+                />
               </div>
             </div>
-            <div className="collateralDisplay">
-              {collateral.map((token: AlchemyAPIToken) => <CollateralToken data={token}/>)}
+          </div>
+
+          <div className={['', undefined].includes(borrower) ? 'disabledSection' : ''}>
+            <div className="collateralContainer">
+              <div className="collateralTopSection">
+                <h3 style={{ margin: 0 }}>Collateral</h3>
+                <div className="valueAddCollateral">
+                  <div 
+                    className="addButton" 
+                    onClick={!['', undefined].includes(borrower) ? () => setShowModal(true) : () => {}}
+                  >
+                    Add
+                  </div>
+                </div>
+              </div>
+              <div className="collateralDisplay">
+                {collateral.map((token: AlchemyAPIToken) => <CollateralToken data={token}/>)}
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>   

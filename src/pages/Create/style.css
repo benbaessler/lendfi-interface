@@ -86,7 +86,6 @@
 }
 
 .collateralContainer {
-  opacity: .6;
   transition: .1s;
   margin-bottom: 30px;
 }
@@ -97,6 +96,10 @@
 
 #shown {
   opacity: 1;
+}
+
+#hidden {
+  opacity: .7;
 }
 
 .collateralDisplay {
