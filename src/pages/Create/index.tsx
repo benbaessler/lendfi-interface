@@ -25,6 +25,7 @@ export default function Create() {
 
   // Input
   const [amountInput, setAmountInput] = useState<string>()
+  const [amountError, setAmountError] = useState<boolean>(false)
   const [interestInput, setInterestInput] = useState<string>()
   const [deadlineInput, setDeadlineInput] = useState<any>()
 
@@ -44,6 +45,10 @@ export default function Create() {
   const submitLoan = async () => {
     setSubmitBtnText('Submitting...')
     setSubmitBtnActive(false)
+
+    const balance = await library.getBalance(account)
+    if (Number(utils.parseEther(amountInput as string)) > Number(balance)) setAmountError(true)
+    else setAmountError(false)
 
     try {
       const factoryContract = getContract(library.getSigner())
@@ -153,7 +158,10 @@ export default function Create() {
           </div>
 
           <div className="amountContainer">
-            <h3>Loan Amount</h3>
+            <div className="amountErrorWrapper">
+              <h3>Loan Amount</h3>
+              <p className="errorMessage" style={{ display: amountError ? '' : 'none'}}>You have insufficient funds</p>
+            </div> 
             <div className="input">
               <input 
                 type="number"

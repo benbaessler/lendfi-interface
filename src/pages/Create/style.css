@@ -132,3 +132,14 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.amountErrorWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.amountErrorWrapper h3 {
+  margin: 0;
+}
