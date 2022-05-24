@@ -1,6 +1,6 @@
 // Goerli testnet address: 0x16ae973088549AfA8520C39De102E965657600A9
 
-export const rinkebyAddress = '0x8406a388474A8d6bC15481C51BB224ffbBcf3891'
+export const rinkebyAddress = '0xE7614e981561Ec0C88bF948b7b0d39656ECBece2'
 export const factoryAddress = rinkebyAddress
 
 // Mainnet = 'ethereum'

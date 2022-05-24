@@ -2,10 +2,10 @@ import './style.css'
 import CreateLoanSS from '../../assets/guide/createLoan.png'
 import ManageLoansSS from '../../assets/guide/manageLoans.png'
 import ConfirmLoanSS from '../../assets/guide/confirmLoan.png'
+import RevokeConfirmationSS from '../../assets/guide/revokeConfirmation.png'
 import PaybackLoanSS from '../../assets/guide/paybackLoan.png'
 import ClaimCollateralSS from '../../assets/guide/claimCollateral.png'
 import extendDeadlineSS from '../../assets/guide/extendDeadline.png'
-import BenImage from '../../assets/images/me.png'
 import { factoryAddress } from '../../constants/index';
 
 export default function About() {
@@ -50,6 +50,16 @@ export default function About() {
           </span>
         </div>
         <img src={ConfirmLoanSS}/>
+      </div>
+      <div className="stepContainer" id="revokeConfirmationSection"> 
+        <div className="stepTitleContainer">
+          <h1>Revoking confirmation</h1>
+          <span>
+            Calling this function will transfer ETH or the NFT you depositted into the contract
+            back to your wallet.
+          </span>
+        </div>
+        <img src={RevokeConfirmationSS}/>
       </div>
       <div className="stepContainer" id="paybackLoanSection"> 
         <div className="stepTitleContainer">

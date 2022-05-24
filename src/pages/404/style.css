@@ -1,0 +1,22 @@
+.errorWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 80px;
+}
+
+.errorWrapper img {
+  opacity: .2;
+  height: 200px;
+  margin-bottom: 30px;
+}
+
+.errorWrapper h1 {
+  opacity: .5;
+  font-size: 50px;
+}
+
+.errorWrapper span {
+  opacity: .3;
+}

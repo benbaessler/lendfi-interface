@@ -1,7 +1,7 @@
 import './style.css'
 import { injected } from '../../connectors'
 import { useWeb3React } from '@web3-react/core'
-import LandingImage from '../../assets/images/landing-animation.png'
+import LandingImage from '../../assets/images/landingAnimation.png'
 import { EnteredContext } from '../../state/entered'
 import { useContext } from 'react'
 

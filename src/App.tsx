@@ -7,6 +7,7 @@ import About from './pages/About';
 import { LoanPage } from './pages/Loan';
 import NavigationBar from './components/NavigationBar';
 import Landing from './pages/Landing';
+import Page404 from './pages/404'
 import { useWeb3React } from '@web3-react/core';
 import { useEffect, useContext } from 'react'
 import { EnteredContext } from './state/entered' 
@@ -52,7 +53,7 @@ function App() {
           }}/> 
         </>
       : <Route path="/" exact component={Landing}/>}
-      
+      <Route path="/404" exact component={Page404}/>
     </div>
   </Switch>
 }

@@ -78,6 +78,11 @@
   height: 260px;
 }
 
+#revokeConfirmationSection img {
+  height: 180px;
+  border-radius: 5px;
+}
+
 #paybackLoanSection img {
   height: 260px;
 }

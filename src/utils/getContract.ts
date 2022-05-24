@@ -1,8 +1,8 @@
 import { Contract, Signer } from 'ethers'
 import { factoryAddress } from "../constants"
-import LoanFactoryABI from '../abis/LoanFactory.json'
+import LendFiABI from '../abis/LendFi.json'
 
 export default function getContract(signer: Signer) {
-  const factoryContract = new Contract(factoryAddress, LoanFactoryABI.abi, signer) 
+  const factoryContract = new Contract(factoryAddress, LendFiABI.abi, signer) 
   return factoryContract
 }

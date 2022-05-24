@@ -8,7 +8,7 @@ import { ModalProps } from '../../utils/modal';
 import { networkName, openseaBaseUrl } from '../../constants';
 import { getOpenSeaLink } from '../../utils/tokens';
 import { Spinner } from 'react-bootstrap';
-import NoTokensImage from '../../assets/images/no-tokens.png'
+import NoTokensImage from '../../assets/images/notFound.png'
 
 export default function TokenModal({ data, show, onClose, loading }: ModalProps) {
   const [collateral, setCollateral] = useContext(CollateralContext)
