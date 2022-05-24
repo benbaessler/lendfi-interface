@@ -47,6 +47,12 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   const [claimBtnText, setClaimBtnText] = useState<string>('Claim')
   const [claimBtnActive, setClaimBtnActive] = useState<boolean>(false)
+
+  const [paybackBtnText, setPaybackBtnText] = useState<string>('Transfer')
+  const [paybackBtnActive, setPaybackBtnActive] = useState<boolean>(false)
+
+  const [revokeBtnText, setRevokeBtnText] = useState<string>('Revoke')
+  const [revokeBtnActive, setRevokeBtnActive] = useState<boolean>(false)
   
   // Extend deadline input
   const [deadlineInput, setDeadlineInput] = useState<string>('')
@@ -56,20 +62,34 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   // Updating UI status
   const updateManageInterface = async (data: Loan) => {
     const collateralContract = new Contract(data.collateral[0], ERC721ABI, library.getSigner())
+    const expired = Number(data.deadline) < Math.round(Date.now() / 1000)
+    let confirmed: boolean
 
     setIsParticipant(true)
-    if (data.lender === account && data.lenderConfirmed) setConfirmed()
-    else if (data.borrower === account && data.borrowerConfirmed) setConfirmed()
+
+    // Confirmation section
+    if (data.lender === account) confirmed = data.lenderConfirmed
+    else confirmed = data.borrowerConfirmed
+    if (confirmed) setConfirmed()
+
+    // Approve/Confirm button
     if (data.borrower === account && !data.borrowerConfirmed) {
       const approved: boolean = await collateralContract.isApprovedForAll(data.borrower, factoryAddress)
       setTokensApproved(approved)
       if (!approved) setConfirmBtnText('Approve')
     }
-    if (Number(data.deadline) < Math.round(Date.now() / 1000) && data.active) {
-      setClaimBtnActive(true)
-    }
+
+    // Pay loan button
+    if (data.active && !expired && !data.loanPaid) setPaybackBtnActive(true)
+    if (data.loanPaid) setPaybackBtnText('Loan paid')
+    if (expired) setPaybackBtnText('Loan expired')
+
+    // Claim Collateral button
+    if (expired && data.active) setClaimBtnActive(true)
     if (data.collateralClaimed) setClaimBtnText('Claimed')
-    if (data.executed && !data.collateralClaimed) setClaimBtnText('Loan paid')
+    if (data.loanPaid) setClaimBtnText('Loan paid')
+
+    if (expired && !data.active && confirmed) setRevokeBtnActive(true)
   }
 
   const init = async () => {
@@ -77,8 +97,6 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const factoryContract = getContract(library.getSigner())
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
-
-    console.log(_loan.amount)
 
     // Getting Loan status
     const _statusDetails = getStatusDetails(_loan)
@@ -105,7 +123,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     setConfirmBtnText('Confirming...')
 
     const factoryContract = getContract(library.getSigner())
-    await factoryContract.confirmLender(loanId, { value: loan!.amount.add(loan!.amount.div(100)) }).then(() => {
+    await factoryContract.confirmLender(loanId, { value: loan!.amount }).then(() => {
       setConfirmed()
     }).catch((error: any) => {
       setConfirmBtnText('Confirm')
@@ -184,14 +202,48 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   }
 
   const paybackLoan = async () => {
+    setPaybackBtnActive(false)
+    setPaybackBtnText('Initiating...')
+
     const factoryContract = getContract(library.getSigner())
-    const tx = await factoryContract.paybackLoan(loanId, { value: loan!.amount.add(loan!.interest).add(loan!.amount.div(200))})
-    console.log(`Successfully paid back loan (${tx.hash})`)
+    await factoryContract.paybackLoan(loanId, { value: loan!.amount.add(loan!.interest)}).then(() => {
+      setPaybackBtnText('Loan paid')
+    }).catch((error: any) => {
+      setPaybackBtnActive(true)
+      setPaybackBtnText('Transfer')
+    })
+  }
+
+  const revokeConfirmation = async () => {
+    setRevokeBtnActive(false)
+    setRevokeBtnText('Revoking...')
+
+    const factoryContract = getContract(library.getSigner())
+    await factoryContract.revokeConfirmation(0).then(() => {
+      setRevokeBtnText('Revoked')
+    }).catch((error: any) => {
+      setRevokeBtnActive(true)
+      setRevokeBtnText('Revoke')
+    })
   }
 
   useEffect(() => { if (active) init() }, [active])
 
   // ! : Add Redirect for non-existing Loan ID.
+
+  const RevokeConfirmationSection = () => {
+    return <div className={statusDetails![0] === 'Expired' && (
+      loan!.lender === account && loan!.lenderConfirmed || loan!.borrowerConfirmed
+    ) ? '' : 'disabledSection'}>
+      <h3>Revoke Confirmation</h3>
+      <p>If the loan expires with only 1 confirmation, you can revoke it and claim your depositted assets.</p>
+      <div 
+        className="button submitButton dbButton" 
+        id={revokeBtnActive ? '' : 'disabled'}
+        onClick={revokeBtnActive ? revokeConfirmation : () => {}}
+      >{revokeBtnText}</div>
+    </div>
+  }
 
   return <>
     <div className="interfaceContainer dashboardWrapper" style={{ width: isParticipant ? '80%' : '40%'}}>
@@ -277,19 +329,22 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
               <p>You will receive your Collateral NFT as soon as the Loan is paid.</p>
               <div 
                 className="button submitButton dbButton" 
-                id={loan!.executed ? 'disabled' : ''}
-                onClick={loan!.active ? paybackLoan : () => {}}
-              >{loan!.loanPaid ? 'Paid' : 'Transfer'}</div>
+                id={paybackBtnActive ? '' : 'disabled'}
+                onClick={paybackBtnActive ? paybackLoan : () => {}}
+              >{paybackBtnText}</div>
             </div>}
-            {loan!.lender === account ? <div className={loan!.active && statusDetails![0] === 'Expired' ? '' : 'disabledSection'}>
-              <h3>Claim Collateral</h3>
-              <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
-              <div 
-                className="button submitButton dbButton" 
-                id={claimBtnActive ? '' : 'disabled'}
-                onClick={claimBtnActive ? claimCollateral : () => {}}
-              >{claimBtnText}</div>
-            </div> : <div/>}
+            {loan!.lender === account ? <>
+              {!loan!.active && loan!.lenderConfirmed ? <RevokeConfirmationSection/> : <div className={loan!.active && statusDetails![0] === 'Expired' ? '' : 'disabledSection'}>
+                <h3>Claim Collateral</h3>
+                <p>You can claim the tokens if the Loan has expired and the Lender has not paid back the Loan.</p>
+                <div 
+                  className="button submitButton dbButton" 
+                  id={claimBtnActive ? '' : 'disabled'}
+                  onClick={claimBtnActive ? claimCollateral : () => {}}
+                >{claimBtnText}</div>
+              </div>}
+            </> : <RevokeConfirmationSection/>
+            }
           </div> : <div/>}
         </div>
       </div>}
