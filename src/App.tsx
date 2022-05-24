@@ -47,13 +47,14 @@ function App() {
             setNavSelected('create')
             return <Create/>
           }}/>
-          <Route path="/about" exact render={() => {
-            setNavSelected('about')
-            return <About/>
-          }}/> 
         </>
       : <Route path="/" exact component={Landing}/>}
+      
       <Route path="/404" exact component={Page404}/>
+      <Route path="/about" exact render={() => {
+        setNavSelected('about')
+        return <About/>
+      }}/> 
     </div>
   </Switch>
 }

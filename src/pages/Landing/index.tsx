@@ -16,15 +16,18 @@ export default function Landing() {
     } catch (error) { console.error(error) }
   }
 
-  return <>{!entered ? <div className="landingContainer">
-    <div className="landingWelcomeContainer">
-      <h1>Welcome to <span id="welcomeTitle">LendFi</span></h1>
-      <h6>Easily lend or borrow crypto using fully secure and autonomous smart contracts with NFT collateral.</h6>
-      <div className="button submitButton" id="landingEnterBtn" onClick={connectWallet}>Get Started</div>
+  return <>{!entered ? 
+    <div className="landingWrapper">
+      <div className="landingContainer">
+        <div className="landingText">
+          <h1>Welcome to LendFi</h1>
+          <p>Easily lend or borrow crypto using fully secure and autonomous smart contracts with NFT collateral and 0% fees.</p>
+        </div>
+        <img src={LandingImage}/>
+      </div>
     </div>
-    <div className="landingBrandingContainer">
-      <img src={LandingImage}/>
-    </div>
-  </div> : <div/>}
+    
+
+  : <div/>}
   </>
 }
