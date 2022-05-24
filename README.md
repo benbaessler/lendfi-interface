@@ -27,4 +27,13 @@ If the borrower has failed to pay back the loan before the deadline, the lender 
 ### Extending the deadline
 As long as the loan is not executed, the lender can extend the deadline at any time. Executed = paid or claimed collateral
 
-> © 2022, Ben Baessler. All rights reserved.
+# Details
+
+LendFi Contract: [`0x8406a388474A8d6bC15481C51BB224ffbBcf3891`](https://rinkeby.etherscan.io/address/0x8406a388474A8d6bC15481C51BB224ffbBcf3891)
+
+View on GitHub: [benbaessler/lendfi-contracts](https://github.com/benbaessler/lendfi-contracts)
+
+Built by [**Ben Baessler**](https://benbaessler.com)
+
+
+> © 2020, Ben Baessler. All rights reserved.
