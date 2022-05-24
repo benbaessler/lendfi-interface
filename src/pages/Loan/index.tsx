@@ -1,6 +1,6 @@
 import './style.css'
 import { useEffect, useState } from 'react'
-import { RouteComponentProps, useParams, Redirect } from "react-router-dom"
+import { RouteComponentProps, useParams, useHistory } from 'react-router-dom';
 import getContract from '../../utils/getContract'
 import { useWeb3React } from '@web3-react/core'
 import { Loan } from '../../types/loan'
@@ -13,7 +13,6 @@ import { etherscanBaseUrl, factoryAddress } from '../../constants'
 import CollateralPopup from '../../components/ViewCollateral';
 import { getToken } from '../../utils/tokens'
 import { AlchemyAPIToken } from '../../types'
-import { CollateralContext } from '../../state/collateral';
 
 interface RouteParams { id: string }
 
@@ -21,8 +20,10 @@ interface UserProfile extends RouteComponentProps<RouteParams> {}
 
 export const LoanPage: React.FC<RouteParams> = (props) => {
   const params = useParams<RouteParams>()
-  const loanId = params.id
+  const history = useHistory()
 
+  const loanId = params.id
+  
   const [loading, setLoading] = useState<boolean>(true)
 
   const { account, active, library } = useWeb3React()
@@ -95,7 +96,9 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   const init = async () => {
     // Getting Loan data
     const factoryContract = getContract(library.getSigner())
-    const _loan = await factoryContract.getLoan(loanId)
+    const _loan = await factoryContract.getLoan(loanId).catch((error: any) => {
+      history.push('/404')
+    })
     setLoan(_loan)
 
     // Getting Loan status
@@ -219,7 +222,8 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     setRevokeBtnText('Revoking...')
 
     const factoryContract = getContract(library.getSigner())
-    await factoryContract.revokeConfirmation(0).then(() => {
+
+    await factoryContract.revokeConfirmation(loanId).then(() => {
       setRevokeBtnText('Revoked')
     }).catch((error: any) => {
       setRevokeBtnActive(true)
