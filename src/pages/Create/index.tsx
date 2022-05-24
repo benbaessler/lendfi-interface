@@ -13,7 +13,7 @@ import InvalidIcon from '../../assets/icons/invalid.png'
 import { isAddress } from '../../utils'
 
 export default function Create() {
-  const { account,library } = useWeb3React()
+  const { account, library } = useWeb3React()
 
   // Role input
   const [role, setRole] = useState<string>()
@@ -56,8 +56,6 @@ export default function Create() {
       let interestFee: BigNumber
       if (interestInEth) interestFee = utils.parseEther(interestInput!)
       else interestFee = BigNumber.from((Number(utils.parseEther(amountInput!)) * Number(interestInput) / 100).toString())
-
-      // const interestFee = BigNumber.from((Number(amountInWei) * Number(interestInput) / 100).toString())
       const parsedCollateral: TokenStruct[] = collateral.map((token: AlchemyAPIToken) => ({
         contractAddress: token.contract.address,
         tokenId: Number(token.id.tokenId)
@@ -71,15 +69,18 @@ export default function Create() {
         setRole('')
         setAmountInput('')
         setInterestInput('')
-        setDeadlineInput(0)
+        setDeadlineInput('')
         setAddressInput('')
         setCollateral([])
       })
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error.message)
+
       setSubmitBtnText('Failed')
       setSubmitBtnActive(true)
       setTimeout(() => setSubmitBtnText('Submit Loan'), 1000)
     }
+
     const balance = await library.getBalance(account)
     if (Number(utils.parseEther(amountInput as string)) > Number(balance)) setAmountError(true)
     else setAmountError(false)
@@ -87,10 +88,12 @@ export default function Create() {
 
   useEffect(() => {
     if (role === 'Lender') { 
-      setLender(account as string) 
+      setLender(account!) 
       setBorrower('')
-    } else if (role === 'Borrower') {
-      setBorrower(account as string)
+    }  
+
+    if (role === 'Borrower') {
+      setBorrower(account!)
       setLender('')
     }
   }, [role])
@@ -111,9 +114,11 @@ export default function Create() {
       return
     }
 
-    const acTimeout = setTimeout(() => {
+    const acTimeout = setTimeout(async () => {
       setAddressChecked(true)
       setAddressValid(isAddress(addressInput!))
+      if (role === 'Lender') setBorrower(addressInput)
+      if (role === 'Borrower') setLender(addressInput)
     }, 2000)
 
     return () => clearTimeout(acTimeout)
@@ -131,11 +136,6 @@ export default function Create() {
     }
   }, [interestInEth])
 
-  useEffect(() => {
-    console.log(borrower)
-    console.log(['', undefined].includes(borrower))
-  }, [])
-
   const CollateralToken = ({ data }: TokenCardProps) => {
     return <div className="collatContainer"><a 
       href={getOpenSeaLink(data)}
@@ -145,7 +145,6 @@ export default function Create() {
       <img id="collatImage" src={data.media[0].gateway}/>
       <div className="collatInfo">
         <p>{data.title}</p>
-        {/* <p id="floorPrice">{data.floor} ETH</p> */}
       </div>
     </a>
     </div>

@@ -9,6 +9,7 @@ import { getStatusDetails, formatDeadline } from '../../utils/loanDetails';
 import { useHistory } from "react-router-dom";
 import CollateralPopup from '../../components/ViewCollateral';
 import { getToken } from '../../utils/tokens';
+import { sortBy } from 'lodash'
 
 /*
   Parameters:
@@ -33,7 +34,13 @@ export default function Loans() {
     const factoryContract = getContract(library.getSigner())
     // Change later
     const loans = await factoryContract.getSenderLoans()
-    setLoans(loans)
+
+    // Sort after deadline
+    const activeLoans = loans.filter((loan: Loan) => !loan.executed)
+    const expiredLoans = loans.filter((loan: Loan) => loan.executed)
+    const sortedLoans = sortBy(activeLoans, "deadline").concat(sortBy(expiredLoans, "deadline"))
+
+    setLoans(sortedLoans)
   }
 
   const formatUser = async (address: string): Promise<string> => {
@@ -74,7 +81,7 @@ export default function Loans() {
             <span id="c-4">{utils.formatEther(data.interest)} ETH</span>
             <span id="c-5" style={{ 
               opacity: status === 'Expired' ? .5 : 1
-            }}>{formattedDeadline.toLocaleString()}</span>
+            }}>{formattedDeadline}</span>
           </div>
         </div>
       </>
@@ -91,6 +98,6 @@ export default function Loans() {
       <span id="c-4">Interest</span>
       <span id="c-5">Deadline</span>
     </div>
-    {loans.slice(0).reverse().map((loan: Loan) => <LoanComponent data={loan}/>)}
+    {loans.map((loan: Loan) => <LoanComponent data={loan}/>)}
   </div>
 }

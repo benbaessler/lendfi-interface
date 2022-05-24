@@ -10,7 +10,7 @@
   margin-bottom: 30px;
   max-width: 850px;
   width: 80%;
-  padding: 30px 40px 35px 40px;
+  padding: 40px;
   border-radius: 10px;
 }
 
@@ -27,9 +27,7 @@
 
 .aboutWrapper h1 {
   text-align: center;
-  font-size: 30px !important;
   margin-bottom: 15px;
-  font-weight: 600;
 }
 
 .aboutWrapper a {
@@ -43,7 +41,7 @@
 }
 
 .processContainer h1 {
-  margin-bottom: 50px;
+  margin-bottom: 60px;
 }
 
 .aboutWrapper span {
@@ -54,10 +52,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 70px;
 }
 
 .stepContainer img {
-  height: 270px;
+  height: 290px;
 }
 
 .stepTitleContainer {
@@ -69,4 +68,45 @@
 .stepTitleContainer h1 {
   font-size: 22px !important;
   margin-bottom: 15px !important;
+}
+
+#manageLoansSection img {
+  height: 250px;
+}
+
+#confirmLoanSection img {
+  height: 260px;
+}
+
+#paybackLoanSection img {
+  height: 260px;
+}
+
+#claimCollateralSection img {
+  height: 300px;
+}
+
+#extendDeadlineSection img {
+  height: 165px;
+  border-radius: 5px;
+}
+
+#extendDeadlineSection {
+  margin-bottom: 30px;
+}
+
+.detailsContainer img {
+  height: 150px;
+  border-radius: 50%;
+}
+
+.detailsContainer {
+  display: flex;
+}
+
+.detailsContractInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  text-align: end;
 }

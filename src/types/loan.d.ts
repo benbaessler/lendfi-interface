@@ -4,7 +4,7 @@ export interface Loan {
   id: number
   lender: string
   borrower: string
-  amount: number
+  amount: BigNumber
   interest: number
   collateral: [string, BigNumber]
   deadline: number

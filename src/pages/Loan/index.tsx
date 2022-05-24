@@ -78,7 +78,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     const _loan = await factoryContract.getLoan(loanId)
     setLoan(_loan)
 
-    console.log(_loan)
+    console.log(_loan.amount)
 
     // Getting Loan status
     const _statusDetails = getStatusDetails(_loan)
@@ -105,7 +105,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
     setConfirmBtnText('Confirming...')
 
     const factoryContract = getContract(library.getSigner())
-    await factoryContract.confirmLender(loanId, { value: BigNumber.from(loan!.amount).add(loan!.amount / 100)}).then(() => {
+    await factoryContract.confirmLender(loanId, { value: loan!.amount.add(loan!.amount.div(100)) }).then(() => {
       setConfirmed()
     }).catch((error: any) => {
       setConfirmBtnText('Confirm')
@@ -135,7 +135,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
       
     } else {
       const approved: boolean = await collateralContract.isApprovedForAll(_loan.borrower, factoryAddress)
-      if (!approved)
+      if (!approved) return
 
       setConfirmBtnText('Confirming...')
 
@@ -185,7 +185,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
 
   const paybackLoan = async () => {
     const factoryContract = getContract(library.getSigner())
-    const tx = await factoryContract.paybackLoan(loanId, { value: BigNumber.from(loan!.amount).add(loan!.interest).add(loan!.amount / 200) })
+    const tx = await factoryContract.paybackLoan(loanId, { value: loan!.amount.add(loan!.interest).add(loan!.amount.div(200))})
     console.log(`Successfully paid back loan (${tx.hash})`)
   }
 

@@ -23,7 +23,7 @@ export const getStatusDetails = (data: Loan) => {
 }
 
 export const formatDeadline = (unixTimestamp: number) => {
-  return new Date(unixTimestamp * 1000)
+  return new Date(unixTimestamp * 1000).toLocaleTimeString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})
 }
 
 export const getConfirmations = (data: Loan) => {

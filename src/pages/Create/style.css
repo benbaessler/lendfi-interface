@@ -114,9 +114,12 @@
   width: 200px;
 }
 
+.collatContainer a {
+  text-decoration: none;
+}
+
 .collatContainer p {
   font-size: 12px;
-  max-width: 65%;
   opacity: .9;
 }
 
@@ -132,6 +135,10 @@
   display: flex;
   height: 50px;
   align-items: center;
+}
+
+.collatInfo p {
+  text-decoration: none !important;
 }
 
 .amountErrorWrapper {

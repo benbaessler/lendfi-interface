@@ -1,6 +1,6 @@
 import { getAddress } from '@ethersproject/address'
 
-export function isAddress(value: string) {
+export const isAddress = (value: string) => {
   try {
     const _ = getAddress(value)
     return true
@@ -9,9 +9,10 @@ export function isAddress(value: string) {
   }
 }
 
-export function shortenAddress(address: string, chars = 4) {
+export const shortenAddress = (address: string, chars = 4) => {
   if (address === '') return ''
   const valid = isAddress(address)
+
   if (!valid) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
