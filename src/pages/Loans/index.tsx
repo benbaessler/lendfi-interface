@@ -67,7 +67,10 @@ export default function Loans() {
       setCollatLoading(false)
     }
 
-    useEffect(() => { init() }, [])
+    useEffect(() => { 
+      document.title = 'LendFi - Loans'
+      init() 
+    }, [])
 
     return (
       <>

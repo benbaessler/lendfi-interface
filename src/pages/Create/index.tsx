@@ -136,6 +136,8 @@ export default function Create() {
     }
   }, [interestInEth])
 
+  useEffect(() => { document.title = 'LendFi - Create' }, [])
+
   const CollateralToken = ({ data }: TokenCardProps) => {
     return <div className="collatContainer"><a 
       href={getOpenSeaLink(data)}

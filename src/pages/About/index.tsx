@@ -1,4 +1,7 @@
 import './style.css'
+
+import { useEffect } from 'react'
+
 import CreateLoanSS from '../../assets/guide/createLoan.png'
 import ManageLoansSS from '../../assets/guide/manageLoans.png'
 import ConfirmLoanSS from '../../assets/guide/confirmLoan.png'
@@ -9,6 +12,11 @@ import extendDeadlineSS from '../../assets/guide/extendDeadline.png'
 import { factoryAddress } from '../../constants/index';
 
 export default function About() {
+
+  useEffect(() => {
+    document.title = 'LendFi - About'
+  }, [])
+
   return <div className="aboutWrapper">
     <div className="aboutContainer aboutSectionContainer">
       <h1>About</h1>

@@ -1,4 +1,5 @@
 import './style.css'
+import { useEffect } from 'react'
 import { injected } from '../../connectors'
 import { useWeb3React } from '@web3-react/core'
 import LandingImage from '../../assets/images/landingAnimation.png'
@@ -15,6 +16,8 @@ export default function Landing() {
       setEntered(true)
     } catch (error) { console.error(error) }
   }
+
+  useEffect(() => { document.title = 'LendFi - Welcome' }, [])
 
   return <>{!entered ? 
     <div className="landingWrapper">

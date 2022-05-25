@@ -232,6 +232,7 @@ export const LoanPage: React.FC<RouteParams> = (props) => {
   }
 
   useEffect(() => { if (active) init() }, [active])
+  useEffect(() => { document.title = `LendFi - Loan #${loanId}` }, [])
 
   // ! : Add Redirect for non-existing Loan ID.
 
