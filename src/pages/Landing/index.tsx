@@ -21,7 +21,7 @@ export default function Landing() {
       <div className="landingContainer">
         <div className="landingText">
           <h1>Welcome to LendFi</h1>
-          <p>Easily lend or borrow crypto using fully secure and autonomous smart contracts with NFT collateral and 0% fees.</p>
+          <p>Lend and borrow ETH using NFT collateral (ERC-721) with 0% fees.</p>
         </div>
         <img src={LandingImage}/>
       </div>
